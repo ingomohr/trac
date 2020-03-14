@@ -1,0 +1,6 @@
+org/ingomohr/trac/TracParser.class
+org/ingomohr/trac/FileReader.class
+org/ingomohr/trac/model/TracItem.class
+org/ingomohr/trac/App.class
+org/ingomohr/trac/model/TracTopic.class
+org/ingomohr/trac/model/TracProtocol.class
