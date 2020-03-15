@@ -24,3 +24,6 @@ hs_err_pid*
 
 # Mac OS custom attributes file for folder
 **/.DS_Store
+
+# Maven build artifacts
+target/
