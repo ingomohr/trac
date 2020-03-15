@@ -11,3 +11,13 @@ Mo (Mar 9 2020)
 08:44-08:57 Topic B         // item from 08:44 to 08:57, worked on "Topic B"
 09:25-45 Topic C: Topic C1  // item from 09:25 to 09:45, worked on "Topic C1" as sub-topic of "Topic C"
 ```
+
+#### Example
+```
+Tue (Mar 10 2020)
+---
+08:30 Meeting: Daily Standup
+08:45 Dev: Bugfix ProjectX
+09:24 Misc: Review GTD items
+09:30-11:16 Doc: Project X: Complete Manual
+```
