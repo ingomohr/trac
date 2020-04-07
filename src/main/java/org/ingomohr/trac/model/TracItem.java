@@ -21,6 +21,7 @@ public class TracItem {
     private String rawText;
     private int timeSpentInMinutes;
     private TracTopic topic;
+    private TracProtocol protocol;
 
     public String getStartTime() {
         return startTime;
@@ -62,10 +63,12 @@ public class TracItem {
         this.topic = topic;
     }
 
-    @Override
-    public String toString() {
-        return "TracItem [endTime=" + endTime + ", rawText=" + rawText + ", startTime=" + startTime
-                + ", timeSpentInMinutes=" + timeSpentInMinutes + ", topic=" + topic + "]";
+    public TracProtocol getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(TracProtocol protocol) {
+        this.protocol = protocol;
     }
 
     @Override
@@ -73,6 +76,7 @@ public class TracItem {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
+        result = prime * result + ((protocol == null) ? 0 : protocol.hashCode());
         result = prime * result + ((rawText == null) ? 0 : rawText.hashCode());
         result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
         result = prime * result + timeSpentInMinutes;
@@ -94,6 +98,11 @@ public class TracItem {
                 return false;
         } else if (!endTime.equals(other.endTime))
             return false;
+        if (protocol == null) {
+            if (other.protocol != null)
+                return false;
+        } else if (!protocol.equals(other.protocol))
+            return false;
         if (rawText == null) {
             if (other.rawText != null)
                 return false;
@@ -112,6 +121,12 @@ public class TracItem {
         } else if (!topic.equals(other.topic))
             return false;
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "TracItem [endTime=" + endTime + ", protocol=" + protocol + ", rawText=" + rawText + ", startTime="
+                + startTime + ", timeSpentInMinutes=" + timeSpentInMinutes + ", topic=" + topic + "]";
     }
 
 }
