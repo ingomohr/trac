@@ -16,7 +16,7 @@ import org.ingomohr.trac.model.TracTopic;
 /**
  * Parser to read given raw protocol content into a protocol model.
  */
-public class TracParser {
+public class TracProtocolParser {
 
 	private static final Pattern PATTERN_ITEM = Pattern.compile("([0-2][0-9]:[0-5][0-9])(-[0-2][0-9]:[0-5][0-9])?(.*)");
 

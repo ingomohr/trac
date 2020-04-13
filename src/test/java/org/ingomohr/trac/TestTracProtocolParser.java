@@ -11,13 +11,13 @@ import org.ingomohr.trac.model.TracTopic;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class TestTracParser {
+public class TestTracProtocolParser {
 
-	private TracParser objUT;
+	private TracProtocolParser objUT;
 
 	@BeforeEach
 	void prep() {
-		objUT = new TracParser();
+		objUT = new TracProtocolParser();
 	}
 
 	@Test
