@@ -37,7 +37,9 @@ class TestTracProtocolWriterByTopic {
 				"08:24 Dev: Trac",
 				"08:44 Break: Pomodoro",
 				"08:54 Chore: Mail-Inbox",
-				"09:00-11:02 Dev: Trac"
+				"09:00-22:02 Dev: Trac",
+				"02:00-10:00 Sleep"
+				
 				
 	// @formatter:on
 
@@ -61,11 +63,12 @@ class TestTracProtocolWriterByTopic {
 				
 				"Protocol by Topics",
 				"------------------",
-				"Total time spent: 2:38",
+				"Total time spent: 21:38",
 				"",
-				"2:22 ##################..  90% Dev",
-				"0:10 #...................   6% Break",
-				"0:06 ....................   4% Chore"
+				"13:22 ############........  62% Dev",
+				" 8:00 #######.............  37% Sleep",
+				" 0:10 ....................   1% Break",
+				" 0:06 ....................   0% Chore"
 				
 	// @formatter:on
 

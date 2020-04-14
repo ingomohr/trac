@@ -81,8 +81,20 @@ public class TracProtocolWriterByTopic {
 	return builder.toString();
     }
 
-    private String getInfoTimeSpent(int totalMinutesSpent, int allMinutes) {
-	return toHoursInfo(totalMinutesSpent);
+    private String getInfoTimeSpent(int minutesSpent, int totalMinutesInProtocol) {
+	String time = toHoursInfo(minutesSpent);
+	String total = toHoursInfo(totalMinutesInProtocol);
+
+	StringBuilder builder = new StringBuilder();
+	builder.append(time);
+
+	int n = total.length() - time.length();
+	while (n > 0) {
+	    builder.insert(0, " ");
+	    n--;
+	}
+
+	return builder.toString();
     }
 
     private String toHoursInfo(int minutes) {
