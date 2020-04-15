@@ -1,7 +1,5 @@
 package org.ingomohr.trac;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Objects;
@@ -12,161 +10,155 @@ import java.util.regex.Pattern;
 import org.ingomohr.trac.model.TracItem;
 import org.ingomohr.trac.model.TracProtocol;
 import org.ingomohr.trac.model.TracTopic;
+import org.ingomohr.trac.util.TimeDateConverter;
 
 /**
  * Parser to read given raw protocol content into a protocol model.
  */
 public class TracProtocolParser {
 
-	private static final Pattern PATTERN_ITEM = Pattern.compile("([0-2][0-9]:[0-5][0-9])(-[0-2][0-9]:[0-5][0-9])?(.*)");
+    private static final Pattern PATTERN_ITEM = Pattern.compile("([0-2][0-9]:[0-5][0-9])(-[0-2][0-9]:[0-5][0-9])?(.*)");
 
-	/**
-	 * Parses a {@link TracProtocol} from a given document.
-	 * 
-	 * @param pDocument the document to parse. Cannot be <code>null</code>.
-	 * @return new protocol. Never <code>null</code>.
-	 */
-	public TracProtocol parse(String pDocument) {
-		Objects.requireNonNull(pDocument, "Document cannot be null.");
-		TracProtocol protocol = new TracProtocol();
+    /**
+     * Parses a {@link TracProtocol} from a given document.
+     * 
+     * @param pDocument the document to parse. Cannot be <code>null</code>.
+     * @return new protocol. Never <code>null</code>.
+     */
+    public TracProtocol parse(String pDocument) {
+        Objects.requireNonNull(pDocument, "Document cannot be null.");
+        TracProtocol protocol = new TracProtocol();
 
-		if (!pDocument.isEmpty()) {
-			String[] lines = pDocument.split(System.lineSeparator());
+        if (!pDocument.isEmpty()) {
+            String[] lines = pDocument.split(System.lineSeparator());
 
-			TracItem predecessorItem = null;
+            TracItem predecessorItem = null;
 
-			for (int i = 0; i < lines.length; i++) {
-				String line = lines[i].trim();
+            for (int i = 0; i < lines.length; i++) {
+                String line = lines[i].trim();
 
-				final Matcher matcher = PATTERN_ITEM.matcher(line);
-				final boolean isItemLine = matcher.matches();
+                final Matcher matcher = PATTERN_ITEM.matcher(line);
+                final boolean isItemLine = matcher.matches();
 
-				if (i == 0 && !isItemLine) {
-					protocol.setTitle(line.trim());
-				} else if (isItemLine) {
-					TracItem item = new TracItem();
-					protocol.getItems().add(item);
-					item.setProtocol(protocol);
+                if (i == 0 && !isItemLine) {
+                    protocol.setTitle(line.trim());
+                } else if (isItemLine) {
+                    TracItem item = new TracItem();
+                    protocol.getItems().add(item);
+                    item.setProtocol(protocol);
 
-					item.setRawText(line);
-					parseItem(matcher, line, item, predecessorItem);
+                    item.setRawText(line);
+                    parseItem(matcher, line, item, predecessorItem);
 
-					predecessorItem = item;
+                    predecessorItem = item;
 
-				}
+                }
 
-			}
-		}
+            }
+        }
 
-		return protocol;
-	}
+        return protocol;
+    }
 
-	private void parseItem(Matcher matcher, String line, TracItem target, TracItem predecessorItem) {
+    private void parseItem(Matcher matcher, String line, TracItem target, TracItem predecessorItem) {
 
-		int count = matcher.groupCount();
+        int count = matcher.groupCount();
 
-		switch (count) {
-		case 3:
-			String start = matcher.group(1);
-			String end = matcher.group(2);
-			String payload = matcher.group(3);
+        switch (count) {
+        case 3:
+            String start = matcher.group(1);
+            String end = matcher.group(2);
+            String payload = matcher.group(3);
 
-			parseStartTime(start, target);
-			parseEndTime(end, target);
-			parsePayload(payload, target);
-			break;
+            parseStartTime(start, target);
+            parseEndTime(end, target);
+            parsePayload(payload, target);
+            break;
 
-		default:
-			throw new RuntimeException("Unsupported match: Cannot read line: '" + line + "'");
-		}
+        default:
+            throw new RuntimeException("Unsupported match: Cannot read line: '" + line + "'");
+        }
 
-		target.setTimeSpentInMinutes(computeMinutesSpent(target));
+        target.setTimeSpentInMinutes(computeMinutesSpent(target));
 
-		if (predecessorItem != null && predecessorItem.getEndTime() == null) {
-			predecessorItem.setEndTime(target.getStartTime());
-			predecessorItem.setTimeSpentInMinutes(computeMinutesSpent(predecessorItem));
-		}
-	}
+        if (predecessorItem != null && predecessorItem.getEndTime() == null) {
+            predecessorItem.setEndTime(target.getStartTime());
+            predecessorItem.setTimeSpentInMinutes(computeMinutesSpent(predecessorItem));
+        }
+    }
 
-	private int computeMinutesSpent(TracItem item) {
-		String start = item.getStartTime();
-		String end = item.getEndTime();
+    private int computeMinutesSpent(TracItem item) {
+        String start = item.getStartTime();
+        String end = item.getEndTime();
 
-		if (start != null && end != null) {
-			String pattern = "HH:mm";
-			SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        if (start != null && end != null) {
+            TimeDateConverter converter = new TimeDateConverter();
 
-			Date dateStart;
-			Date dateEnd;
-			try {
-				dateStart = simpleDateFormat.parse(start);
-				dateEnd = simpleDateFormat.parse(end);
-				long diffInMillis = dateEnd.getTime() - dateStart.getTime();
-				return (int) TimeUnit.MILLISECONDS.toMinutes(diffInMillis);
-			} catch (ParseException e) {
-				throw new RuntimeException("Cannot read time stamp.", e);
-			}
-		}
+            Date dateStart = converter.toDate(start);
+            Date dateEnd = converter.toDate(end);
+            long diffInMillis = dateEnd.getTime() - dateStart.getTime();
+            return (int) TimeUnit.MILLISECONDS.toMinutes(diffInMillis);
+        }
 
-		return -1;
-	}
+        return -1;
+    }
 
-	private void parsePayload(String payload, TracItem target) {
-		if (payload != null && !payload.isEmpty()) {
+    private void parsePayload(String payload, TracItem target) {
+        if (payload != null && !payload.isEmpty()) {
 
-			final String trimmedPayload = payload.trim();
+            final String trimmedPayload = payload.trim();
 
-			final String[] payloadAndComment = trimmedPayload.split("//");
+            final String[] payloadAndComment = trimmedPayload.split("//");
 
-			final String[] segments = payloadAndComment[0].split(":");
+            final String[] segments = payloadAndComment[0].split(":");
 
-			TracTopic parentTopic = null;
+            TracTopic parentTopic = null;
 
-			for (int i = 0; i < segments.length; i++) {
+            for (int i = 0; i < segments.length; i++) {
 
-				final String topicName = segments[i].trim();
+                final String topicName = segments[i].trim();
 
-				TracTopic topic = null;
-				Collection<TracTopic> topicsList = null;
+                TracTopic topic = null;
+                Collection<TracTopic> topicsList = null;
 
-				if (i == 0) {
-					topicsList = target.getProtocol().getTopics();
-				} else {
-					Objects.requireNonNull(parentTopic);
-					topicsList = parentTopic.getChildren();
-				}
+                if (i == 0) {
+                    topicsList = target.getProtocol().getTopics();
+                } else {
+                    Objects.requireNonNull(parentTopic);
+                    topicsList = parentTopic.getChildren();
+                }
 
-				topic = getTopic(topicsList, topicName);
+                topic = getTopic(topicsList, topicName);
 
-				if (topic == null) {
-					topic = new TracTopic();
-					topic.setName(topicName);
+                if (topic == null) {
+                    topic = new TracTopic();
+                    topic.setName(topicName);
 
-					topicsList.add(topic);
-					topic.setParent(parentTopic);
-				}
+                    topicsList.add(topic);
+                    topic.setParent(parentTopic);
+                }
 
-				target.setTopic(topic);
-				parentTopic = topic;
-			}
+                target.setTopic(topic);
+                parentTopic = topic;
+            }
 
-		}
+        }
 
-	}
+    }
 
-	private TracTopic getTopic(Collection<TracTopic> topics, String name) {
-		return topics.stream().filter(tp -> Objects.equals(name, tp.getName())).findFirst().orElse(null);
+    private TracTopic getTopic(Collection<TracTopic> topics, String name) {
+        return topics.stream().filter(tp -> Objects.equals(name, tp.getName())).findFirst().orElse(null);
 
-	}
+    }
 
-	private void parseEndTime(String endTime, TracItem target) {
-		if (endTime != null && !endTime.isEmpty()) {
-			target.setEndTime(endTime.substring(1));
-		}
-	}
+    private void parseEndTime(String endTime, TracItem target) {
+        if (endTime != null && !endTime.isEmpty()) {
+            target.setEndTime(endTime.substring(1));
+        }
+    }
 
-	private void parseStartTime(String group, TracItem target) {
-		target.setStartTime(group);
-	}
+    private void parseStartTime(String group, TracItem target) {
+        target.setStartTime(group);
+    }
 
 }
