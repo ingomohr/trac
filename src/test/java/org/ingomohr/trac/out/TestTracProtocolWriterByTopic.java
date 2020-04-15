@@ -23,66 +23,71 @@ class TestTracProtocolWriterByTopic {
 
     @BeforeEach
     void prep() {
-	objUT = new TracProtocolWriterByTopic();
+        objUT = new TracProtocolWriterByTopic();
     }
 
     @Test
     void test() throws Exception {
 
-	String lines = String.join(System.lineSeparator(), Arrays.asList(
+        String lines = String.join(System.lineSeparator(), Arrays.asList(
 
-	// @formatter:off
+        // @formatter:off
 
 				
-				"08:24 Dev: Trac",
-				"08:44 Break: Pomodoro",
-				"08:54 Chore: Mail-Inbox",
-				"09:00-22:02 Dev: Trac",
-				"02:00-10:00 Sleep"
+				"02:24 Dev: Trac",
+				"02:44 Break: Pomodoro",
+				"02:54 Chore: Mail-Inbox",
+				"03:00-19:02 Dev: Trac",
+				"20:00-22:00 Rev: X"
 				
 				
 	// @formatter:on
 
-	));
+        ));
 
-	/*
-	 * TODO drop the use of the parser here (once there is a simple API to create a
-	 * new model).
-	 */
-	final TracProtocol protocol = new TracProtocolParser().parse(lines);
+        /*
+         * TODO drop the use of the parser here (once there is a simple API to create a
+         * new model).
+         */
+        final TracProtocol protocol = new TracProtocolParser().parse(lines);
 
-	final String home = System.getProperty("user.home");
-	final Path outPath = Paths.get(home, "TestTracProtocolWriterByTopic.txt");
-	final OutputStream out = Files.newOutputStream(outPath);
+        final String home = System.getProperty("user.home");
+        final Path outPath = Paths.get(home, "TestTracProtocolWriterByTopic.txt");
+        final OutputStream out = Files.newOutputStream(outPath);
 
-	objUT.write(protocol, new PrintStream(out));
+        objUT.write(protocol, new PrintStream(out));
 
-	String expected = String.join(System.lineSeparator(), Arrays.asList(
+        String expected = String.join(System.lineSeparator(), Arrays.asList(
 
-	// @formatter:off
+        // @formatter:off
 				
 				"Protocol by Topics",
-				"------------------",
-				"Total time spent: 21:38",
-				"",
-				"13:22 ############........  62% Dev",
-				" 8:00 #######.............  37% Sleep",
+				"-----------------------",
+				"Start           : 02:24",
+				"End             : 22:00",
+				"-----------------------",
+				"Total time      : 18:38",
+				"Breaks          :  0:10",
+				"Time w/o breaks : 18:28",
+				"-----------------------",
+				"16:22 #################...  88% Dev",
+				" 2:00 ##..................  11% Rev",
 				" 0:10 ....................   1% Break",
-				" 0:06 ....................   0% Chore"
+				" 0:06 ....................   1% Chore"
 				
 	// @formatter:on
 
-	));
+        ));
 
-	final String actual = readActualLines(outPath);
-	assertEquals(expected, actual);
+        final String actual = readActualLines(outPath);
+        assertEquals(expected, actual);
 
     }
 
     private String readActualLines(final Path outPath) throws IOException {
-	final List<String> writtenLines = new FileReader().readAllLines(outPath);
-	final String actual = String.join(System.lineSeparator(), writtenLines);
-	return actual;
+        final List<String> writtenLines = new FileReader().readAllLines(outPath);
+        final String actual = String.join(System.lineSeparator(), writtenLines);
+        return actual;
     }
 
 }
