@@ -48,8 +48,8 @@ public class TracProtocolWriterByTopic {
         out.println("Protocol by Topics");
 
         writeHeaderSeparator(out);
-        writeHeaderEntry(out, "Start           :", startTime);
-        writeHeaderEntry(out, "End             :", endTime);
+        writeHeaderStartEnd(out, "Start :", startTime, inspector.getFirstSectionTitle(protocol));
+        writeHeaderStartEnd(out, "End   :", endTime, inspector.getLastSectionTitle(protocol));
         writeHeaderSeparator(out);
 
         writeHeaderEntry(out, "Total time      :", timeTotal);
@@ -63,6 +63,11 @@ public class TracProtocolWriterByTopic {
             out.println(toEntryLine(entry, timeSpentTotalinMinutes));
         });
 
+    }
+
+    private void writeHeaderStartEnd(PrintStream out, String name, String value, String sectionTitle) {
+        String val = value + ((sectionTitle != null) ? (" : " + sectionTitle) : "");
+        out.println(name + " " + val);
     }
 
     private void writeHeaderEntry(PrintStream out, String name, String hhmm) {
