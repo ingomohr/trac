@@ -131,4 +131,30 @@ public class TracProtocolInspector {
         return topic;
     }
 
+    /**
+     * Returns the name of the first section.
+     * 
+     * @param protocol the protocol to get the first section title for. Cannot be
+     *                 <code>null</code>.
+     * @return first section title. <code>null</code> if not found.
+     */
+    public String getFirstSectionTitle(TracProtocol protocol) {
+        Objects.requireNonNull(protocol);
+        return protocol.getItems().size() > 0 ? protocol.getItems().get(0).getSectionTitle() : null;
+    }
+
+    /**
+     * Returns the name of the last section.
+     * 
+     * @param protocol the protocol to get the last section title for. Cannot be
+     *                 <code>null</code>.
+     * @return last section title. <code>null</code> if not found.
+     */
+    public String getLastSectionTitle(TracProtocol protocol) {
+        Objects.requireNonNull(protocol);
+        return protocol.getItems().size() > 0
+                ? protocol.getItems().get(protocol.getItems().size() - 1).getSectionTitle()
+                : null;
+    }
+
 }

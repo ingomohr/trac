@@ -34,30 +34,51 @@ public class TracProtocolParser {
 
             TracItem predecessorItem = null;
 
+            String currentSectionTitle = null;
+
             for (int i = 0; i < lines.length; i++) {
                 String line = lines[i].trim();
 
                 final Matcher matcher = PATTERN_ITEM.matcher(line);
                 final boolean isItemLine = matcher.matches();
 
-                if (i == 0 && !isItemLine) {
-                    protocol.setTitle(line.trim());
-                } else if (isItemLine) {
-                    TracItem item = new TracItem();
-                    protocol.getItems().add(item);
-                    item.setProtocol(protocol);
+                if (!ignoreLine(line, isItemLine)) {
+                    if (!isItemLine) {
+                        currentSectionTitle = line.trim();
+                        if (i == 0) {
+                            protocol.setTitle(currentSectionTitle);
+                        }
+                    } else if (isItemLine) {
+                        TracItem item = new TracItem();
+                        protocol.getItems().add(item);
+                        item.setProtocol(protocol);
+                        item.setSectionTitle(currentSectionTitle);
 
-                    item.setRawText(line);
-                    parseItem(matcher, line, item, predecessorItem);
+                        item.setRawText(line);
+                        parseItem(matcher, line, item, predecessorItem);
 
-                    predecessorItem = item;
-
+                        predecessorItem = item;
+                    }
                 }
 
             }
         }
 
         return protocol;
+    }
+
+    private boolean ignoreLine(String line, boolean isItemLine) {
+        if (isItemLine) {
+            return false;
+        } else if ("".equals(line.trim())) {
+            return true;
+        } else if (line.startsWith("#")) {
+            return true;
+        } else if (Pattern.matches("-+", line)) {
+            return true;
+        }
+
+        return false;
     }
 
     private void parseItem(Matcher matcher, String line, TracItem target, TracItem predecessorItem) {

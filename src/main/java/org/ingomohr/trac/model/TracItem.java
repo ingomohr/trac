@@ -11,11 +11,14 @@ package org.ingomohr.trac.model;
  * <li>the number of minutes spent on the item (this is the diff between start
  * time and end time)</li>
  * <li>the corresponding topic to which the item belongs</li>
+ * <li>a section-title. If a protocol consists of multiple smaller sections with
+ * a title each, each item has its section's title.</li>
  * </ul>
  * </p>
  */
 public class TracItem {
 
+    private String sectionTitle;
     private String startTime;
     private String endTime;
     private String rawText;
@@ -71,6 +74,14 @@ public class TracItem {
         this.protocol = protocol;
     }
 
+    public String getSectionTitle() {
+        return sectionTitle;
+    }
+
+    public void setSectionTitle(String sectionTitle) {
+        this.sectionTitle = sectionTitle;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -78,6 +89,7 @@ public class TracItem {
         result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
         result = prime * result + ((protocol == null) ? 0 : protocol.hashCode());
         result = prime * result + ((rawText == null) ? 0 : rawText.hashCode());
+        result = prime * result + ((sectionTitle == null) ? 0 : sectionTitle.hashCode());
         result = prime * result + ((startTime == null) ? 0 : startTime.hashCode());
         result = prime * result + timeSpentInMinutes;
         result = prime * result + ((topic == null) ? 0 : topic.hashCode());
@@ -108,6 +120,11 @@ public class TracItem {
                 return false;
         } else if (!rawText.equals(other.rawText))
             return false;
+        if (sectionTitle == null) {
+            if (other.sectionTitle != null)
+                return false;
+        } else if (!sectionTitle.equals(other.sectionTitle))
+            return false;
         if (startTime == null) {
             if (other.startTime != null)
                 return false;
@@ -125,8 +142,9 @@ public class TracItem {
 
     @Override
     public String toString() {
-        return "TracItem [endTime=" + endTime + ", protocol=" + protocol + ", rawText=" + rawText + ", startTime="
-                + startTime + ", timeSpentInMinutes=" + timeSpentInMinutes + ", topic=" + topic + "]";
+        return "TracItem [sectionTitle=" + sectionTitle + ", startTime=" + startTime + ", endTime=" + endTime
+                + ", rawText=" + rawText + ", timeSpentInMinutes=" + timeSpentInMinutes + ", topic=" + topic
+                + ", protocol=" + protocol + "]";
     }
 
 }
