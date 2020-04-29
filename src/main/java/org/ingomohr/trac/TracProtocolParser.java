@@ -14,6 +14,29 @@ import org.ingomohr.trac.util.TimeDateConverter;
 
 /**
  * Parser to read given raw protocol content into a protocol model.
+ * <p>
+ * A protocol is given as text:
+ * 
+ * <pre>
+Fr
+---
+08:27 Topic A
+08:44-08:57 Topic B
+09:25-45 Topic C: Topic C1
+ * 
+ * </pre>
+ * </p>
+ * <p>
+ * <ul>
+ * <li>Each line represents one protocol entry</li>
+ * <li>An entry starts with a starting time</li>
+ * <li>Each line can optionally have an ending time. If not specify, the ending
+ * time is the starting time of the follow-up entry.</li>
+ * <li>Each entry can specify a topic-path by using <code>":"</code> as
+ * separator</li>
+ * <li><code>"Break"</code> is a special topic. It is reserved for breaks.
+ * </ul>
+ * </p>
  */
 public class TracProtocolParser {
 
