@@ -1,4 +1,4 @@
-package org.ingomohr.trac;
+package org.ingomohr.trac.util;
 
 import java.io.IOException;
 import java.nio.file.Files;

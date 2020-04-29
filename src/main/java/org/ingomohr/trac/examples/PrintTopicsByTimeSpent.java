@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.ingomohr.trac.FileReader;
 import org.ingomohr.trac.TracProtocolParser;
 import org.ingomohr.trac.model.TracProtocol;
 import org.ingomohr.trac.out.TracProtocolWriterByTopic;
+import org.ingomohr.trac.util.FileReader;
 
 public class PrintTopicsByTimeSpent {
 
