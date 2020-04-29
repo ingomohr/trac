@@ -22,15 +22,15 @@ public class TracProtocolParser {
     /**
      * Parses a {@link TracProtocol} from a given document.
      * 
-     * @param pDocument the document to parse. Cannot be <code>null</code>.
+     * @param document the document to parse. Cannot be <code>null</code>.
      * @return new protocol. Never <code>null</code>.
      */
-    public TracProtocol parse(String pDocument) {
-        Objects.requireNonNull(pDocument, "Document cannot be null.");
+    public TracProtocol parse(String document) {
+        Objects.requireNonNull(document, "Document cannot be null.");
         TracProtocol protocol = new TracProtocol();
 
-        if (!pDocument.isEmpty()) {
-            String[] lines = pDocument.split(System.lineSeparator());
+        if (!document.isEmpty()) {
+            String[] lines = document.split(System.lineSeparator());
 
             TracItem predecessorItem = null;
 
