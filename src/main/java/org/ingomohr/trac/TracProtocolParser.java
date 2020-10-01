@@ -1,5 +1,6 @@
 package org.ingomohr.trac;
 
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Objects;
@@ -140,6 +141,15 @@ public class TracProtocolParser {
 
             Date dateStart = converter.toDate(start);
             Date dateEnd = converter.toDate(end);
+
+            if (dateEnd.before(dateStart)) {
+
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(dateEnd);
+                cal.add(Calendar.DATE, 1); // add 1 day
+                dateEnd = cal.getTime();
+            }
+
             long diffInMillis = dateEnd.getTime() - dateStart.getTime();
             return (int) TimeUnit.MILLISECONDS.toMinutes(diffInMillis);
         }

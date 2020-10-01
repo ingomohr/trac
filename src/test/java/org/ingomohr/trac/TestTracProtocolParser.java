@@ -43,6 +43,15 @@ public class TestTracProtocolParser {
     }
 
     @Test
+    void endTimeOnNextDay() {
+        TracProtocol protocol = objUT.parse("22:33-02:44");
+        assertEquals(1, protocol.getItems().size());
+
+        TracItem item = protocol.getItems().get(0);
+        assertIsItem("22:33-02:44", "22:33", "02:44", 251, item);
+    }
+
+    @Test
     void simpleEntry() {
         TracProtocol protocol = objUT.parse("08:33 Dev");
         assertEquals(1, protocol.getItems().size());
