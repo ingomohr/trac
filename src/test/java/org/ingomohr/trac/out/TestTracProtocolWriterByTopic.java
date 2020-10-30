@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import org.ingomohr.trac.TracProtocolParser;
+import org.ingomohr.trac.in.TracProtocolParser;
 import org.ingomohr.trac.model.TracProtocol;
 import org.ingomohr.trac.util.FileReader;
 import org.junit.jupiter.api.BeforeEach;
