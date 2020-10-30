@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+import org.ingomohr.trac.in.TracProtocolParser;
 import org.ingomohr.trac.model.TracItem;
 import org.ingomohr.trac.model.TracProtocol;
 import org.ingomohr.trac.model.TracTopic;

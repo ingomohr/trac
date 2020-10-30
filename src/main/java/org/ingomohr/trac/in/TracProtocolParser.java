@@ -1,4 +1,4 @@
-package org.ingomohr.trac;
+package org.ingomohr.trac.in;
 
 import java.util.Calendar;
 import java.util.Collection;

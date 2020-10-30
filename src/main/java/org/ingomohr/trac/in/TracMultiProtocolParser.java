@@ -1,4 +1,4 @@
-package org.ingomohr.trac;
+package org.ingomohr.trac.in;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ Mo
 ---
 08:27 Topic A
 08:44-08:57 Topic B
-09:25-45 Topic C: Topic C1
+09:25-09:45 Topic C: Topic C1
  * 
  * </pre>
  */
