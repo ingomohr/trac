@@ -162,7 +162,7 @@ public class TracProtocolParser {
 
             final String trimmedPayload = payload.trim();
 
-            final String[] payloadAndComment = trimmedPayload.split("//");
+            final String[] payloadAndComment = trimmedPayload.split("#");
 
             final String[] segments = payloadAndComment[0].split(":");
 

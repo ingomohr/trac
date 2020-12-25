@@ -143,8 +143,7 @@ public class TracItem {
     @Override
     public String toString() {
         return "TracItem [sectionTitle=" + sectionTitle + ", startTime=" + startTime + ", endTime=" + endTime
-                + ", rawText=" + rawText + ", timeSpentInMinutes=" + timeSpentInMinutes + ", topic=" + topic
-                + ", protocol=" + protocol + "]";
+                + ", rawText=" + rawText + ", timeSpentInMinutes=" + timeSpentInMinutes + ", topic=" + topic + "]";
     }
 
 }

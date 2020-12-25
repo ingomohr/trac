@@ -1,4 +1,4 @@
-package org.ingomohr.trac;
+package org.ingomohr.trac.in;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.ingomohr.trac.in.TracMultiProtocolParser;
 import org.ingomohr.trac.model.TracItem;
 import org.ingomohr.trac.model.TracProtocol;
 import org.ingomohr.trac.util.FileReader;
