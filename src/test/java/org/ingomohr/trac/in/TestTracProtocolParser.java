@@ -346,13 +346,6 @@ public class TestTracProtocolParser {
         };
     }
 
-    private void assertIsItem(String raw, String start, String end, int timeSpentInMin, TracItem actualItem) {
-        assertEquals(raw, actualItem.getRawText());
-        assertEquals(start, actualItem.getStartTime());
-        assertEquals(end, actualItem.getEndTime());
-        assertEquals(timeSpentInMin, actualItem.getTimeSpentInMinutes());
-    }
-
     private void assertIsTopic(String name, int numChildren, TracTopic topic) {
         assertEquals(name, topic.getName());
         assertEquals(numChildren, topic.getChildren().size());
