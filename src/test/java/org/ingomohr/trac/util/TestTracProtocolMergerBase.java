@@ -77,8 +77,6 @@ public class TestTracProtocolMergerBase {
                     }
 
                 } else {
-                    Objects.requireNonNull(tt);
-
                     TracTopic child = protocol.getTopics().stream().filter(t -> Objects.equals(t.getName(), topic))
                             .findFirst().orElse(null);
                     if (child == null) {
