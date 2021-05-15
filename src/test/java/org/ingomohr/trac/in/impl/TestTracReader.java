@@ -11,6 +11,7 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.DiagnosingMatcher;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.ingomohr.trac.in.TracReaderException;
 import org.ingomohr.trac.model.ITracItem;
 import org.ingomohr.trac.model.ITracProtocol;
@@ -70,6 +71,7 @@ class TestTracReader {
         assertEquals(2, protocol.getItems().size());
 
         assertThat(protocol.getItems().get(0), isWorkItem("09:00", "10:05", "One"));
+        assertThat(protocol.getItems().get(1), isWorkItem("10:05", "11:00", "Two"));
     }
 
     @Test
@@ -87,6 +89,27 @@ class TestTracReader {
         assertEquals(2, protocol.getItems().size());
 
         assertThat(protocol.getItems().get(0), isWorkItem("09:00", "10:05", "One"));
+        assertThat(protocol.getItems().get(1), isWorkItem("10:05", "11:00", "Two"));
+    }
+
+    @Test
+    void read_NonAdjacentWorklogItemsShortNotation_HasStartAndEndTimesSet() throws Exception {
+        var doc = """
+                09:00 One
+                # some comment
+                10:05 Two
+                11:00-11:30 Three
+                """;
+
+        List<ITracProtocol> ps = objUT.read(doc);
+        assertEquals(1, ps.size());
+
+        ITracProtocol protocol = ps.get(0);
+
+        assertThat(protocol.getItems().get(0), isWorkItem("09:00", "10:05", "One"));
+        assertThat(protocol.getItems().get(1), Matchers.isA(ITracItem.class));
+        assertThat(protocol.getItems().get(2), isWorkItem("10:05", "11:00", "Two"));
+        assertThat(protocol.getItems().get(3), isWorkItem("11:00", "11:30", "Three"));
     }
 
     private Matcher<ITracItem> isWorkItem(String start, String end, String message) {
