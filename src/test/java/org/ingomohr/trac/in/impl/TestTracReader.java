@@ -2,6 +2,7 @@ package org.ingomohr.trac.in.impl;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
@@ -110,6 +111,97 @@ class TestTracReader {
         assertThat(protocol.getItems().get(1), Matchers.isA(ITracItem.class));
         assertThat(protocol.getItems().get(2), isWorkItem("10:05", "11:00", "Two"));
         assertThat(protocol.getItems().get(3), isWorkItem("11:00", "11:30", "Three"));
+    }
+
+    @Test
+    void read_NoFirstComment_ProtocolHasNoTitle() throws Exception {
+        var doc = """
+                09:00 One
+                """;
+
+        List<ITracProtocol> ps = objUT.read(doc);
+
+        assertNull(ps.get(0).getTitle());
+    }
+
+    @Test
+    void read_HasFirstCommentButIsEmpty_ProtocolHasEmptyStringAsTitle() throws Exception {
+        var doc = """
+                #
+                # Hello World
+                """;
+
+        List<ITracProtocol> ps = objUT.read(doc);
+
+        assertEquals("", (ps.get(0).getTitle()));
+    }
+
+    @Test
+    void read_HasFirstComment_ProtocolHasFirstCommentAsTitle() throws Exception {
+        var doc = """
+                # Hello World
+                # This is a text
+                """;
+
+        List<ITracProtocol> ps = objUT.read(doc);
+
+        assertEquals("Hello World", (ps.get(0).getTitle()));
+    }
+
+    @Test
+    void read_StartsAndEndsWithEmptyLine_EmptyLeadingAndTrailingLinesAreIgnored() throws Exception {
+        var doc = """
+
+                # One
+                08:00 Dev: Component A: So stuff
+                08:30 Orga: X: D
+                08:45-09:00 Review: R
+
+                # Two
+                07:32-08:00 Orga: D
+
+                """;
+
+        List<ITracProtocol> ps = objUT.read(doc);
+        assertEquals(2, ps.size());
+
+        ITracProtocol p0 = ps.get(0);
+        assertEquals("One", (p0.getTitle()));
+        assertEquals(4, p0.getItems().size());
+
+        ITracProtocol p1 = ps.get(1);
+        assertEquals("Two", (p1.getTitle()));
+        assertEquals(2, p1.getItems().size());
+    }
+
+    @Test
+    void read_HasDuplicateProtocols_AllProtocolsAreRead() throws Exception {
+        var doc = """
+                # One
+                08:00 Dev: Component A: So stuff
+                08:30 Orga: X: D
+                08:45-09:00 Review: R
+
+                # Two
+                07:32-08:00 Orga: D
+                """;
+
+        List<ITracProtocol> ps = objUT.read(doc);
+        assertEquals(2, ps.size());
+
+        ITracProtocol p0 = ps.get(0);
+        assertEquals("One", (p0.getTitle()));
+        assertEquals(4, p0.getItems().size());
+        assertThat(p0.getItems().get(0).getText(), CoreMatchers.is("# One"));
+        assertThat(p0.getItems().get(1), isWorkItem("08:00", "08:30", "Dev: Component A: So stuff"));
+        assertThat(p0.getItems().get(2), isWorkItem("08:30", "08:45", "Orga: X: D"));
+        assertThat(p0.getItems().get(3), isWorkItem("08:45", "09:00", "Review: R"));
+
+        ITracProtocol p1 = ps.get(1);
+        assertEquals("Two", (p1.getTitle()));
+        assertEquals(2, p1.getItems().size());
+        assertThat(p1.getItems().get(0).getText(), CoreMatchers.is("# Two"));
+        assertThat(p1.getItems().get(1), isWorkItem("07:32", "08:00", "Orga: D"));
     }
 
     private Matcher<ITracItem> isWorkItem(String start, String end, String message) {

@@ -109,6 +109,12 @@ public class TracReader implements ITracReader {
                 if (isCommentLine(line)) {
                     ITracItem item = createItem(protocol);
                     item.setText(line);
+
+                    if (protocol.getTitle() == null) {
+                        String title = line.substring(getCommentLinePrefix().length()).trim();
+                        protocol.setTitle(title);
+                    }
+
                     processedLine = true;
                 } else {
                     Matcher workLogItemMatcher = PATTERN_ITEM.matcher(line);
