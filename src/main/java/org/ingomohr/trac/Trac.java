@@ -15,8 +15,10 @@ import org.ingomohr.trac.util.FileReader;
  */
 public class Trac {
 
+    private static final String VERSION = "1.0.0";
+
     public static void main(String[] args) {
-        System.out.println("Trac");
+        System.out.println("Trac " + VERSION);
 
         TracConfig cfg = TracConfig.fromArgs(args);
 
