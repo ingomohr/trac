@@ -1,8 +1,0 @@
-Fr (Oct 30 2020)
----
-08:30 Meeting: Daily Standup
-08:45 Dev: ProjectX: BugfixY
-09:24 Orga: Review GTD items
-09:35 Dev: ProjectX: BugfixZ
-10:24 Break
-10:45-11:50 Doc: ProjectX: Complete Manual
