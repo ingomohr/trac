@@ -231,7 +231,7 @@ public class TracReader implements ITracReader {
     }
 
     private TemporalAccessor toTime(String start) {
-        DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern("hh:mm").toFormatter();
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern("HH:mm").toFormatter();
         return formatter.parse(start);
     }
 

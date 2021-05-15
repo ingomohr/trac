@@ -56,7 +56,7 @@ class TestTracReader {
     void read_AdjacentWorklogItemsShortNotation_HasStartAndEndTimesSet() throws Exception {
         var doc = """
                 09:00 One
-                10:05-11:00 Two
+                10:05-17:00 Two
                 """;
 
         List<ITracProtocol> ps = objUT.read(doc);
@@ -67,7 +67,7 @@ class TestTracReader {
         assertEquals(2, protocol.getItems().size());
 
         assertThat(protocol.getItems().get(0), isWorkItem("09:00", "10:05", "One"));
-        assertThat(protocol.getItems().get(1), isWorkItem("10:05", "11:00", "Two"));
+        assertThat(protocol.getItems().get(1), isWorkItem("10:05", "17:00", "Two"));
     }
 
     @Test

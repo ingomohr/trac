@@ -93,7 +93,7 @@ public class TracWorklogItemInspector {
     }
 
     private int getHours(TemporalAccessor time) {
-        int hh = time.get(ChronoField.HOUR_OF_AMPM);
+        int hh = time.get(ChronoField.HOUR_OF_DAY);
         return hh;
     }
 
