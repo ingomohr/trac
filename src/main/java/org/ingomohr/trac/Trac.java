@@ -3,76 +3,80 @@ package org.ingomohr.trac;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.temporal.TemporalAccessor;
 import java.util.List;
 
-import org.ingomohr.trac.in.TracMultiProtocolParser;
-import org.ingomohr.trac.model.TracProtocol;
-import org.ingomohr.trac.out.TracProtocolWriterByTopic;
+import org.ingomohr.trac.in.ITracReader;
+import org.ingomohr.trac.in.impl.TracReader;
+import org.ingomohr.trac.model.ITracProtocol;
 import org.ingomohr.trac.util.FileReader;
-import org.ingomohr.trac.util.TracProtocolMerger;
+import org.ingomohr.trac.util.TimeConverter;
+import org.ingomohr.trac.util.TimeDiffCalculator;
+import org.ingomohr.trac.util.TracProtocolInspector;
 
 /**
  * App class for use with terminal.
  */
 public class Trac {
 
+    private static final String VERSION = "1.0.0";
+
     public static void main(String[] args) {
+        System.out.println("Trac " + VERSION);
 
-        TracConfig config = TracConfig.fromArgs(args);
+        TracConfig cfg = TracConfig.fromArgs(args);
 
-        logInfo("Trac");
-        logInfo("--------------------");
-        logInfo("Path           : " + config.getPath());
-        logInfo("Merge protocols: " + config.isMergeProtocols());
-        logInfo("--------------------");
-
-        Path path = Paths.get(config.getPath());
         try {
-            List<String> lines = new FileReader().readAllLines(path);
-            String allLines = String.join(System.lineSeparator(), lines);
-
-            TracMultiProtocolParser parser = new TracMultiProtocolParser();
-            List<TracProtocol> protocols = parser.parse(allLines);
-            logInfo("Found protocols: " + protocols.size());
-
-            if (config.isMergeProtocols() && protocols.size() > 1) {
-                logInfo("Merging protocols...");
-
-                TracProtocolMerger merger = new TracProtocolMerger(protocols.get(0));
-
-                for (int i = 1; i < protocols.size(); i++) {
-                    merger.merge(protocols.get(i));
-                }
-
-                TracProtocol mergedProtocol = merger.getProtocol();
-
-                TracProtocolWriterByTopic writer = new TracProtocolWriterByTopic();
-                writer.write(mergedProtocol, System.out);
-            } else {
-
-                int i = 1;
-                for (TracProtocol tracProtocol : protocols) {
-                    System.out.println();
-                    logInfo("Protocol #" + i++);
-                    TracProtocolWriterByTopic writer = new TracProtocolWriterByTopic();
-                    writer.write(tracProtocol, System.out);
-                }
-            }
-
+            List<ITracProtocol> protocols = readProtocols(cfg);
+            inspect(protocols, cfg);
         } catch (IOException e) {
-            logError("Cannot read path", e);
+            System.err.println("Cannot read protocols");
+            e.printStackTrace();
+        }
+    }
+
+    private static List<ITracProtocol> readProtocols(TracConfig cfg) throws IOException {
+        String path = cfg.getPath();
+        Path actualPath = Paths.get(path);
+
+        List<String> lines = new FileReader().readAllLines(actualPath);
+        String doc = String.join(System.lineSeparator(), lines);
+
+        ITracReader reader = new TracReader();
+        List<ITracProtocol> protocols = reader.read(doc);
+        return protocols;
+    }
+
+    private static void inspect(List<ITracProtocol> protocols, TracConfig cfg) {
+        if (cfg.isCountProtocols()) {
+            System.out.println("Number of protocols: " + protocols.size());
         }
 
-    }
+        if (cfg.isPrintProtocolTitles()) {
+            int i = 1;
+            for (ITracProtocol protocol : protocols) {
+                System.out.print(i++ + ": " + protocol.getTitle());
 
-    private static void logInfo(String message) {
-        System.out.println("INFO: " + message);
-    }
+                TracProtocolInspector inspector = new TracProtocolInspector();
+                TemporalAccessor start = inspector.getStartTime(protocol);
+                TemporalAccessor end = inspector.getEndTime(protocol);
 
-    private static void logError(String message, Throwable cause) {
-        System.err.println("ERROR: " + message);
-        if (cause != null) {
-            cause.printStackTrace(System.err);
+                if (start != null && end != null) {
+                    TimeConverter converter = new TimeConverter();
+
+                    String startHHmm = converter.toString(start);
+                    String endHHmm = converter.toString(end);
+
+                    int minutes = new TimeDiffCalculator().getDiffInMinutes(start, end);
+                    String hhmm = converter.toHHmm(minutes);
+
+                    System.out.println("  (" + startHHmm + "-" + endHHmm + " => " + hhmm);
+                } else {
+                    System.out.println("  (Start or End time missing)");
+
+                }
+
+            }
         }
     }
 

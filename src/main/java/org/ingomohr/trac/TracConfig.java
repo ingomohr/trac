@@ -1,5 +1,7 @@
 package org.ingomohr.trac;
 
+import java.util.Objects;
+
 /**
  * Configuration used to start Trac.
  */
@@ -7,7 +9,28 @@ public class TracConfig {
 
     private String path;
 
-    private boolean mergeProtocols;
+    private boolean countProtocols;
+
+    private boolean printProtocolTitles;
+
+    public static TracConfig fromArgs(String[] args) {
+        TracConfig config = new TracConfig();
+
+        for (String arg : args) {
+            if (arg.startsWith("-path=")) {
+                config.setPath(arg.substring("-path=".length()));
+            }
+            
+            if (Objects.equals("-countProtocols", arg)) {
+                config.setCountProtocols(true);
+            }
+            if (Objects.equals("-printProtocolTitles", arg)) {
+                config.setPrintProtocolTitles(true);
+            }
+        }
+
+        return config;
+    }
 
     public String getPath() {
         return path;
@@ -17,27 +40,20 @@ public class TracConfig {
         this.path = path;
     }
 
-    public boolean isMergeProtocols() {
-        return mergeProtocols;
+    public boolean isCountProtocols() {
+        return countProtocols;
     }
 
-    public void setMergeProtocols(boolean mergeProtocols) {
-        this.mergeProtocols = mergeProtocols;
+    public void setCountProtocols(boolean countProtocols) {
+        this.countProtocols = countProtocols;
     }
 
-    public static TracConfig fromArgs(String[] args) {
-        TracConfig config = new TracConfig();
+    public boolean isPrintProtocolTitles() {
+        return printProtocolTitles;
+    }
 
-        for (String arg : args) {
-            if (arg.startsWith("-path=")) {
-                config.setPath(arg.substring("-path=".length()));
-            }
-            if (arg.equals("-merge")) {
-                config.setMergeProtocols(true);
-            }
-        }
-
-        return config;
+    public void setPrintProtocolTitles(boolean printProtocolTitles) {
+        this.printProtocolTitles = printProtocolTitles;
     }
 
 }
