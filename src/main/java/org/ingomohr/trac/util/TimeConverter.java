@@ -22,13 +22,13 @@ public class TimeConverter {
     }
 
     /**
-     * Converts the given time values to string format of HH:mm.
+     * Converts the given time value to a HH:mm format.
      * 
      * @param time the time value.
      * @return string representation. <code>null</code> if time was
      *         <code>null</code>..
      */
-    public String toString(TemporalAccessor time) {
+    public String toHHmm(TemporalAccessor time) {
         if (time != null) {
             int hh = getHours(time);
             int mm = getMinutes(time);

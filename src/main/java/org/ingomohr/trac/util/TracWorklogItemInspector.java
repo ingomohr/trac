@@ -21,7 +21,7 @@ public class TracWorklogItemInspector {
         requireNonNull(item);
 
         TemporalAccessor startTime = item.getStartTime();
-        return new TimeConverter().toString(startTime);
+        return new TimeConverter().toHHmm(startTime);
     }
 
     /**
@@ -34,7 +34,7 @@ public class TracWorklogItemInspector {
         requireNonNull(item);
 
         TemporalAccessor startTime = item.getEndTime();
-        return new TimeConverter().toString(startTime);
+        return new TimeConverter().toHHmm(startTime);
     }
 
     /**

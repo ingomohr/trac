@@ -64,8 +64,8 @@ public class Trac {
                 if (start != null && end != null) {
                     TimeConverter converter = new TimeConverter();
 
-                    String startHHmm = converter.toString(start);
-                    String endHHmm = converter.toString(end);
+                    String startHHmm = converter.toHHmm(start);
+                    String endHHmm = converter.toHHmm(end);
 
                     int minutes = new TimeDiffCalculator().getDiffInMinutes(start, end);
                     String hhmm = converter.toHHmm(minutes);
