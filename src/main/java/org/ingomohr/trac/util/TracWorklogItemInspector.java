@@ -2,7 +2,6 @@ package org.ingomohr.trac.util;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 
 import org.ingomohr.trac.model.IWorklogItem;
@@ -22,7 +21,7 @@ public class TracWorklogItemInspector {
         requireNonNull(item);
 
         TemporalAccessor startTime = item.getStartTime();
-        return toString(startTime);
+        return new TimeConverter().toString(startTime);
     }
 
     /**
@@ -35,7 +34,7 @@ public class TracWorklogItemInspector {
         requireNonNull(item);
 
         TemporalAccessor startTime = item.getEndTime();
-        return toString(startTime);
+        return new TimeConverter().toString(startTime);
     }
 
     /**
@@ -50,51 +49,7 @@ public class TracWorklogItemInspector {
 
         TemporalAccessor startTime = item.getStartTime();
         TemporalAccessor endTime = item.getEndTime();
-        if (startTime != null && endTime != null) {
-            int hh1 = getHours(startTime);
-            int mm1 = getMinutes(startTime);
-
-            int hh2 = getHours(endTime);
-            int mm2 = getMinutes(endTime);
-
-            if (hh2 < hh1) {
-                hh2 += 24;
-            }
-
-            return (hh2 - hh1) * 60 + (mm2 - mm1);
-        }
-
-        return -1;
-    }
-
-    protected String toString(TemporalAccessor time) {
-        if (time != null) {
-            int hh = getHours(time);
-            int mm = getMinutes(time);
-
-            StringBuilder builder = new StringBuilder();
-
-            if (hh < 10) {
-                builder.append("0");
-            }
-            builder.append(hh).append(":");
-            if (mm < 10) {
-                builder.append("0");
-            }
-            builder.append(mm);
-
-            return builder.toString();
-        }
-        return null;
-    }
-
-    private int getMinutes(TemporalAccessor time) {
-        return time.get(ChronoField.MINUTE_OF_HOUR);
-    }
-
-    private int getHours(TemporalAccessor time) {
-        int hh = time.get(ChronoField.HOUR_OF_DAY);
-        return hh;
+        return new TimeDiffCalculator().getDiffInMinutes(startTime, endTime);
     }
 
 }
