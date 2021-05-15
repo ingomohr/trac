@@ -3,12 +3,16 @@ package org.ingomohr.trac;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.temporal.TemporalAccessor;
 import java.util.List;
 
 import org.ingomohr.trac.in.ITracReader;
 import org.ingomohr.trac.in.impl.TracReader;
 import org.ingomohr.trac.model.ITracProtocol;
 import org.ingomohr.trac.util.FileReader;
+import org.ingomohr.trac.util.TimeConverter;
+import org.ingomohr.trac.util.TimeDiffCalculator;
+import org.ingomohr.trac.util.TracProtocolInspector;
 
 /**
  * App class for use with terminal.
@@ -51,7 +55,27 @@ public class Trac {
         if (cfg.isPrintProtocolTitles()) {
             int i = 1;
             for (ITracProtocol protocol : protocols) {
-                System.out.println(i++ + ": " + protocol.getTitle());
+                System.out.print(i++ + ": " + protocol.getTitle());
+
+                TracProtocolInspector inspector = new TracProtocolInspector();
+                TemporalAccessor start = inspector.getStartTime(protocol);
+                TemporalAccessor end = inspector.getEndTime(protocol);
+
+                if (start != null && end != null) {
+                    TimeConverter converter = new TimeConverter();
+
+                    String startHHmm = converter.toString(start);
+                    String endHHmm = converter.toString(end);
+
+                    int minutes = new TimeDiffCalculator().getDiffInMinutes(start, end);
+                    String hhmm = converter.toHHmm(minutes);
+
+                    System.out.println("  (" + startHHmm + "-" + endHHmm + " => " + hhmm);
+                } else {
+                    System.out.println("  (Start or End time missing)");
+
+                }
+
             }
         }
     }
