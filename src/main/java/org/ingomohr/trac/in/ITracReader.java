@@ -14,8 +14,7 @@ public interface ITracReader {
      * 
      * @param document the document to read. Cannot be <code>null</code>.
      * @return list of protocols. Never <code>null</code>, possibly empty.
-     * @throws TracReaderException if the given document cannot be read.
      */
-    List<ITracProtocol> read(String document) throws TracReaderException;
+    List<ITracProtocol> read(String document);
 
 }

@@ -3,7 +3,6 @@ package org.ingomohr.trac.in.impl;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import java.util.Objects;
@@ -13,7 +12,6 @@ import org.hamcrest.Description;
 import org.hamcrest.DiagnosingMatcher;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.ingomohr.trac.in.TracReaderException;
 import org.ingomohr.trac.model.ITracItem;
 import org.ingomohr.trac.model.ITracProtocol;
 import org.ingomohr.trac.model.IWorklogItem;
@@ -34,27 +32,6 @@ class TestTracReader {
     void read_EmptyDocument_ReturnsEmptyListOfProtocol() throws Exception {
         List<ITracProtocol> protocols = objUT.read("");
         assertEquals(0, protocols.size());
-    }
-
-    @Test
-    void read_SingleLineOfUnsupportedFormat_ThrowsExceptionForLine0() throws Exception {
-
-        TracReaderException ex = assertThrows(TracReaderException.class, () -> objUT.read("ajkhkjdh 88:44 #"));
-        assertThat(ex.getMessage(), CoreMatchers.containsString("Unsupported"));
-        assertThat(ex.getMessage(), CoreMatchers.containsString("in line 0"));
-    }
-
-    @Test
-    void read_ThirdLineIsUnsupported_ThrowsExceptionForLine2() throws Exception {
-        var doc = """
-                # Doc X
-                09:00-10:00 Hello
-                This is an unsupported line
-                """;
-
-        TracReaderException ex = assertThrows(TracReaderException.class, () -> objUT.read(doc));
-        assertThat(ex.getMessage(), CoreMatchers.containsString("Unsupported"));
-        assertThat(ex.getMessage(), CoreMatchers.containsString("in line 2"));
     }
 
     @Test
@@ -125,21 +102,9 @@ class TestTracReader {
     }
 
     @Test
-    void read_HasFirstCommentButIsEmpty_ProtocolHasEmptyStringAsTitle() throws Exception {
+    void read_HasFirstNonWorklogLine_ProtocolHasFirstLineAsTitle() throws Exception {
         var doc = """
-                #
-                # Hello World
-                """;
-
-        List<ITracProtocol> ps = objUT.read(doc);
-
-        assertEquals("", (ps.get(0).getTitle()));
-    }
-
-    @Test
-    void read_HasFirstComment_ProtocolHasFirstCommentAsTitle() throws Exception {
-        var doc = """
-                # Hello World
+                Hello World
                 # This is a text
                 """;
 
@@ -152,12 +117,14 @@ class TestTracReader {
     void read_StartsAndEndsWithEmptyLine_EmptyLeadingAndTrailingLinesAreIgnored() throws Exception {
         var doc = """
 
-                # One
+                One
+                ---
                 08:00 Dev: Component A: So stuff
                 08:30 Orga: X: D
                 08:45-09:00 Review: R
 
-                # Two
+                Two
+                ---
                 07:32-08:00 Orga: D
 
                 """;
@@ -167,11 +134,11 @@ class TestTracReader {
 
         ITracProtocol p0 = ps.get(0);
         assertEquals("One", (p0.getTitle()));
-        assertEquals(4, p0.getItems().size());
+        assertEquals(5, p0.getItems().size());
 
         ITracProtocol p1 = ps.get(1);
         assertEquals("Two", (p1.getTitle()));
-        assertEquals(2, p1.getItems().size());
+        assertEquals(3, p1.getItems().size());
     }
 
     @Test
@@ -190,7 +157,7 @@ class TestTracReader {
         assertEquals(2, ps.size());
 
         ITracProtocol p0 = ps.get(0);
-        assertEquals("One", (p0.getTitle()));
+        assertEquals("# One", (p0.getTitle()));
         assertEquals(4, p0.getItems().size());
         assertThat(p0.getItems().get(0).getText(), CoreMatchers.is("# One"));
         assertThat(p0.getItems().get(1), isWorkItem("08:00", "08:30", "Dev: Component A: So stuff"));
@@ -198,7 +165,7 @@ class TestTracReader {
         assertThat(p0.getItems().get(3), isWorkItem("08:45", "09:00", "Review: R"));
 
         ITracProtocol p1 = ps.get(1);
-        assertEquals("Two", (p1.getTitle()));
+        assertEquals("# Two", (p1.getTitle()));
         assertEquals(2, p1.getItems().size());
         assertThat(p1.getItems().get(0).getText(), CoreMatchers.is("# Two"));
         assertThat(p1.getItems().get(1), isWorkItem("07:32", "08:00", "Orga: D"));

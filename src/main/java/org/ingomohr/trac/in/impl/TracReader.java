@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.ingomohr.trac.in.ITracReader;
-import org.ingomohr.trac.in.TracReaderException;
 import org.ingomohr.trac.model.ITracItem;
 import org.ingomohr.trac.model.ITracProtocol;
 import org.ingomohr.trac.model.IWorklogItem;
@@ -24,8 +23,9 @@ import org.ingomohr.trac.model.impl.WorklogItem;
  * <p>
  * <ul>
  * <li>Considers empty lines as separators between protocols</li>
- * <li>Considers lines starting with '#' as comments</li>
  * <li>Considers lines starting with 'hh:mm-hh:mm' as worklog items</li>
+ * <li>Considers the first line as document title (if it's no worklog item)</li>
+ * <li>Considers all other lines as meta-information w/o specific semantics</li>
  * </ul>
  * </p>
  */
@@ -35,7 +35,7 @@ public class TracReader implements ITracReader {
             .compile("([0-2][0-9]:[0-5][0-9])(-[0-2][0-9]:[0-5][0-9])?(.*)");
 
     @Override
-    public List<ITracProtocol> read(String document) throws TracReaderException {
+    public List<ITracProtocol> read(String document) {
         requireNonNull(document, "Document cannot be null.");
 
         final List<ITracProtocol> protocols = new ArrayList<ITracProtocol>();
@@ -90,35 +90,32 @@ public class TracReader implements ITracReader {
         return chunks;
     }
 
-    protected ITracProtocol readProtocol(String document) throws TracReaderException {
+    protected ITracProtocol readProtocol(String document) {
         ITracProtocol protocol = createProtocol();
 
         IWorklogItem predecessorWorklogItem = null;
 
         if (!document.isEmpty()) {
-            String[] lines = document.split(System.lineSeparator());
+            final String[] lines = document.split(System.lineSeparator());
 
             for (int i = 0; i < lines.length; i++) {
-                String line = lines[i].trim();
+                final String line = lines[i].trim();
 
                 if (isEmptyLine(line)) {
                     continue;
                 }
 
-                boolean processedLine = false;
-                if (isCommentLine(line)) {
+                final Matcher workLogItemMatcher = PATTERN_ITEM.matcher(line);
+                final boolean isWorkItem = workLogItemMatcher.matches();
+
+                if (!isWorkItem) {
                     ITracItem item = createItem(protocol);
                     item.setText(line);
 
                     if (protocol.getTitle() == null) {
-                        String title = line.substring(getCommentLinePrefix().length()).trim();
-                        protocol.setTitle(title);
+                        protocol.setTitle(line);
                     }
-
-                    processedLine = true;
                 } else {
-                    Matcher workLogItemMatcher = PATTERN_ITEM.matcher(line);
-                    boolean isWorkItem = workLogItemMatcher.matches();
 
                     if (isWorkItem) {
                         IWorklogItem item = createWorklogItem(protocol);
@@ -129,18 +126,8 @@ public class TracReader implements ITracReader {
                         }
 
                         predecessorWorklogItem = item;
-
-                        processedLine = true;
                     }
-
                 }
-
-                if (!processedLine) {
-                    throw new TracReaderException("Unsupported format in line " + i + " of procotol: <" + document
-                            + ">. Needs to start with '" + getCommentLinePrefix()
-                            + "' (comment) or with 'hh:mm-hh:mm' (worklog item)");
-                }
-
             }
         }
 
@@ -198,29 +185,6 @@ public class TracReader implements ITracReader {
      */
     protected ITracProtocol createProtocol() {
         return new TracProtocol();
-    }
-
-    /**
-     * Returns <code>true</code> if the given line is a comment-line.
-     * <p>
-     * The standard implementation considers lines starting with
-     * {@link #getCommentLinePrefix()} as comment.
-     * </p>
-     * 
-     * @param line line to check.
-     * @return <code>true</code> if line is a comment.
-     */
-    protected boolean isCommentLine(String line) {
-        return line.startsWith(getCommentLinePrefix());
-    }
-
-    /**
-     * Returns the comment line prefix.
-     * 
-     * @return comment line prefix. Never <code>null</code>.
-     */
-    protected String getCommentLinePrefix() {
-        return "#";
     }
 
     /**
