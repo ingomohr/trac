@@ -17,6 +17,10 @@ public class TracProtocolInspector {
 
     /**
      * Returns the start time of the protocol.
+     * <p>
+     * The start time is the start time of the first {@link IWorklogItem} in the
+     * protocol.
+     * </p>
      * 
      * @param protocol the protocol. Cannot be <code>null</code>.
      * @return start time. <code>null</code> if none found.
@@ -35,6 +39,10 @@ public class TracProtocolInspector {
 
     /**
      * Returns the end time of the protocol.
+     * <p>
+     * The end time is the end time of the last {@link IWorklogItem} in the
+     * protocol.
+     * </p>
      * 
      * @param protocol the protocol. Cannot be <code>null</code>.
      * @return end time. <code>null</code> if none found.
@@ -61,12 +69,16 @@ public class TracProtocolInspector {
      * @return minutes from start to end. <code>-1<code> if not both start- and end
      *         time are available.
      */
-    public int getTimeSpan(ITracProtocol protocol) {
+    public int getTimeSpanInMinutes(ITracProtocol protocol) {
         requireNonNull(protocol);
 
         TemporalAccessor startTime = getStartTime(protocol);
         TemporalAccessor endTime = getEndTime(protocol);
-        return new TimeDiffCalculator().getDiffInMinutes(startTime, endTime);
+
+        if (startTime != null && endTime != null) {
+            return new TimeDiffCalculator().getDiffInMinutes(startTime, endTime);
+        }
+        return -1;
     }
 
 }
