@@ -1,5 +1,7 @@
 package org.ingomohr.trac.util;
 
+import static java.util.Objects.requireNonNull;
+
 import java.time.temporal.TemporalAccessor;
 
 /**
@@ -10,30 +12,33 @@ public class TimeDiffCalculator {
     /**
      * Returns the diff in minutes between the given start time and the given end
      * time.
+     * <p>
+     * If the end time is smaller than/"before" the start time, this considers the
+     * end time to be located on the next day - e.g. diff("23:30", "00:30") is
+     * 60min.
+     * </p>
      * 
-     * @param startTime start time.
-     * @param endTime   end time.
-     * @return time diff in minutes. <code>-1</code> if not both of the given times
-     *         are specified.
+     * @param startTime start time. Cannot be <code>null</code>.
+     * @param endTime   end time. Cannot be <code>null</code>.
+     * @return time diff in minutes.
      */
     public int getDiffInMinutes(TemporalAccessor startTime, TemporalAccessor endTime) {
-        if (startTime != null && endTime != null) {
-            final TimeConverter tc = new TimeConverter();
+        requireNonNull(startTime);
+        requireNonNull(endTime);
 
-            int hh1 = tc.getHours(startTime);
-            int mm1 = tc.getMinutes(startTime);
+        final TimeConverter tc = new TimeConverter();
 
-            int hh2 = tc.getHours(endTime);
-            int mm2 = tc.getMinutes(endTime);
+        int hh1 = tc.getHours(startTime);
+        int mm1 = tc.getMinutes(startTime);
 
-            if (hh2 < hh1) {
-                hh2 += 24;
-            }
+        int hh2 = tc.getHours(endTime);
+        int mm2 = tc.getMinutes(endTime);
 
-            return (hh2 - hh1) * 60 + (mm2 - mm1);
+        if (hh2 < hh1) {
+            hh2 += 24;
         }
 
-        return -1;
+        return (hh2 - hh1) * 60 + (mm2 - mm1);
     }
 
 }
