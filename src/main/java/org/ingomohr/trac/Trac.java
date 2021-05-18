@@ -26,12 +26,18 @@ public class Trac {
 
         TracConfig cfg = TracConfig.fromArgs(args);
 
-        try {
-            List<ITracProtocol> protocols = readProtocols(cfg);
-            inspect(protocols, cfg);
-        } catch (IOException e) {
-            System.err.println("Cannot read protocols");
-            e.printStackTrace();
+        if (cfg.getPath() == null) {
+            System.out.println("Please specify the file to read.");
+            System.out.println("- e.g. -path=my-protocols.txt");
+        } else {
+
+            try {
+                List<ITracProtocol> protocols = readProtocols(cfg);
+                inspect(protocols, cfg);
+            } catch (IOException e) {
+                System.err.println("Cannot read protocols");
+                e.printStackTrace();
+            }
         }
     }
 
