@@ -105,7 +105,12 @@
 					</archive>
 				</configuration>
 			</plugin>
-			<!-- jacoco: plugin for test coverage report -->
+			<!--
+				jacoco: plugin for test coverage report
+
+				With this, a call of "mvn package" also generates a coverage report in
+				target/site/jacoco/
+			-->
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
