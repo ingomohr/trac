@@ -6,33 +6,30 @@ import java.time.temporal.TemporalAccessor;
 import java.util.List;
 import java.util.Objects;
 
-import org.ingomohr.trac.model.ITracItem;
-import org.ingomohr.trac.model.ITracProtocol;
-import org.ingomohr.trac.model.IWorklogItem;
+import org.ingomohr.trac.model.TracItem;
+import org.ingomohr.trac.model.TracProtocol;
 
 /**
- * Computes information from an {@link ITracProtocol}.
+ * Computes information on an {@link TracProtocol}.
  */
 public class TracProtocolInspector {
 
     /**
      * Returns the start time of the protocol.
      * <p>
-     * The start time is the start time of the first {@link IWorklogItem} in the
+     * The start time is the start time of the first {@link TracItem} in the
      * protocol.
      * </p>
      * 
      * @param protocol the protocol. Cannot be <code>null</code>.
      * @return start time. <code>null</code> if none found.
      */
-    public TemporalAccessor getStartTime(ITracProtocol protocol) {
+    public TemporalAccessor getStartTime(TracProtocol protocol) {
         Objects.requireNonNull(protocol);
 
-        final List<ITracItem> items = protocol.getItems();
-        for (ITracItem item : items) {
-            if (item instanceof IWorklogItem) {
-                return ((IWorklogItem) item).getStartTime();
-            }
+        TracItem firstItem = protocol.items().stream().findFirst().orElse(null);
+        if (firstItem != null) {
+            return firstItem.startTime();
         }
         return null;
     }
@@ -40,26 +37,18 @@ public class TracProtocolInspector {
     /**
      * Returns the end time of the protocol.
      * <p>
-     * The end time is the end time of the last {@link IWorklogItem} in the
-     * protocol.
+     * The end time is the end time of the last {@link TracItem} in the protocol.
      * </p>
      * 
      * @param protocol the protocol. Cannot be <code>null</code>.
      * @return end time. <code>null</code> if none found.
      */
-    public TemporalAccessor getEndTime(ITracProtocol protocol) {
+    public TemporalAccessor getEndTime(TracProtocol protocol) {
         Objects.requireNonNull(protocol);
 
-        List<ITracItem> items = protocol.getItems();
-
-        for (int i = items.size() - 1; i >= 0; i--) {
-            ITracItem item = items.get(i);
-            if (item instanceof IWorklogItem) {
-                return ((IWorklogItem) item).getEndTime();
-            }
-        }
-
-        return null;
+        List<TracItem> items = protocol.items();
+        int size = items.size();
+        return size > 0 ? items.get(size - 1).endTime() : null;
     }
 
     /**
@@ -69,7 +58,7 @@ public class TracProtocolInspector {
      * @return minutes from start to end. <code>-1<code> if not both start- and end
      *         time are available.
      */
-    public int getTimeSpanInMinutes(ITracProtocol protocol) {
+    public int getTimeSpanInMinutes(TracProtocol protocol) {
         requireNonNull(protocol);
 
         TemporalAccessor startTime = getStartTime(protocol);

@@ -10,17 +10,17 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.TemporalAccessor;
 
-import org.ingomohr.trac.model.IWorklogItem;
+import org.ingomohr.trac.model.TracItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class TestTracWorklogItemInspector {
 
-    private TracWorklogItemInspector objUT;
+    private TracItemInspector objUT;
 
     @BeforeEach
     void prep() {
-        objUT = new TracWorklogItemInspector();
+        objUT = new TracItemInspector();
     }
 
     @Test
@@ -55,10 +55,10 @@ class TestTracWorklogItemInspector {
 
     }
 
-    private IWorklogItem mkItem(String startTime, String endTime) {
-        IWorklogItem item = mock(IWorklogItem.class);
-        when(item.getStartTime()).thenReturn(mkTime(startTime));
-        when(item.getEndTime()).thenReturn(mkTime(endTime));
+    private TracItem mkItem(String startTime, String endTime) {
+        TracItem item = mock(TracItem.class);
+        when(item.startTime()).thenReturn(mkTime(startTime));
+        when(item.endTime()).thenReturn(mkTime(endTime));
         return item;
     }
 

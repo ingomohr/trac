@@ -6,9 +6,9 @@ import java.nio.file.Paths;
 import java.time.temporal.TemporalAccessor;
 import java.util.List;
 
+import org.ingomohr.trac.in.DefaultTracReader;
 import org.ingomohr.trac.in.ITracReader;
-import org.ingomohr.trac.in.impl.TracReader;
-import org.ingomohr.trac.model.ITracProtocol;
+import org.ingomohr.trac.model.TracProtocol;
 import org.ingomohr.trac.util.FileReader;
 import org.ingomohr.trac.util.TimeConverter;
 import org.ingomohr.trac.util.TimeDiffCalculator;
@@ -32,7 +32,7 @@ public class Trac {
         } else {
 
             try {
-                List<ITracProtocol> protocols = readProtocols(cfg);
+                List<TracProtocol> protocols = readProtocols(cfg);
                 inspect(protocols, cfg);
             } catch (IOException e) {
                 System.err.println("Cannot read protocols");
@@ -41,27 +41,27 @@ public class Trac {
         }
     }
 
-    private static List<ITracProtocol> readProtocols(TracConfig cfg) throws IOException {
+    private static List<TracProtocol> readProtocols(TracConfig cfg) throws IOException {
         String path = cfg.getPath();
         Path actualPath = Paths.get(path);
 
         List<String> lines = new FileReader().readAllLines(actualPath);
         String doc = String.join(System.lineSeparator(), lines);
 
-        ITracReader reader = new TracReader();
-        List<ITracProtocol> protocols = reader.read(doc);
+        ITracReader reader = new DefaultTracReader();
+        List<TracProtocol> protocols = reader.read(doc);
         return protocols;
     }
 
-    private static void inspect(List<ITracProtocol> protocols, TracConfig cfg) {
+    private static void inspect(List<TracProtocol> protocols, TracConfig cfg) {
         if (cfg.isCountProtocols()) {
             System.out.println("Number of protocols: " + protocols.size());
         }
 
         if (cfg.isPrintProtocolTitles()) {
             int i = 1;
-            for (ITracProtocol protocol : protocols) {
-                System.out.print(i++ + ": " + protocol.getTitle());
+            for (TracProtocol protocol : protocols) {
+                System.out.print(i++ + ": " + protocol.title());
 
                 TracProtocolInspector inspector = new TracProtocolInspector();
                 TemporalAccessor start = inspector.getStartTime(protocol);
@@ -81,7 +81,6 @@ public class Trac {
                     System.out.println("  (Start or End time missing)");
 
                 }
-
             }
         }
     }

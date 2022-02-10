@@ -2,6 +2,8 @@ package org.ingomohr.trac.util;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 
@@ -9,6 +11,20 @@ import java.time.temporal.TemporalAccessor;
  * Converts time-representational data.
  */
 public class TimeConverter {
+
+    /**
+     * Converts the given <code>HH:mm</code> time info to a
+     * {@link TemporalAccessor}.
+     * 
+     * @param HHmm the time in format <code>HH:mm</code>. Cannot be
+     *             <code>null</code>.
+     * @return new {@link TemporalAccessor}. Never <code>null</code>.
+     */
+    public TemporalAccessor toTime(String HHmm) {
+        requireNonNull(HHmm);
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern("HH:mm").toFormatter();
+        return formatter.parse(HHmm);
+    }
 
     /**
      * Converts the given minutes to a HH:mm format.

@@ -4,6 +4,9 @@ import java.util.Objects;
 
 /**
  * Configuration used to start Trac.
+ * <p>
+ * Can be created via {@link #fromArgs(String[])}.
+ * </p>
  */
 public class TracConfig {
 

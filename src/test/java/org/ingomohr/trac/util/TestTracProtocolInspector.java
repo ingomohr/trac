@@ -11,10 +11,8 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
 
-import org.ingomohr.trac.model.ITracItem;
-import org.ingomohr.trac.model.ITracProtocol;
-import org.ingomohr.trac.model.IWorklogItem;
-import org.ingomohr.trac.model.impl.TracProtocol;
+import org.ingomohr.trac.model.TracItem;
+import org.ingomohr.trac.model.TracProtocol;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,11 +30,9 @@ class TestTracProtocolInspector {
         assertAll(() -> {
             assertNull(objUT.getStartTime(mkProtocol()));
             assertNull(objUT.getStartTime(mkProtocol(null, "05:00")));
-            assertNull(objUT.getStartTime(mkProtocol(mkItem(), mkWorklogItem(null, "05:00"))));
-            assertNull(objUT
-                    .getStartTime(mkProtocol(mkItem(), mkWorklogItem(null, "05:00"), mkWorklogItem("04:00", "05:00"))));
-            assertEquals("04:10", toHHmm(objUT.getStartTime(mkProtocol(mkItem(), mkWorklogItem("04:10", "05:00")))));
+            assertNull(objUT.getStartTime(mkProtocol(mkItem(null, null), mkItem("05:00", "06:00"))));
             assertEquals("04:10", toHHmm(objUT.getStartTime(mkProtocol("04:10", "05:00"))));
+            assertEquals("01:00", toHHmm(objUT.getStartTime(mkProtocol(mkItem("01:00", null), mkItem("02:22", null)))));
         });
     }
 
@@ -45,11 +41,9 @@ class TestTracProtocolInspector {
         assertAll(() -> {
             assertNull(objUT.getEndTime(mkProtocol()));
             assertNull(objUT.getEndTime(mkProtocol("05:00", null)));
-            assertNull(objUT.getEndTime(mkProtocol(mkItem(), mkWorklogItem("05:00", null), mkItem())));
-            assertNull(objUT.getEndTime(
-                    mkProtocol(mkItem(), mkWorklogItem("05:00", "06:00"), mkWorklogItem(null, null), mkItem())));
-            assertEquals("05:00", toHHmm(objUT.getEndTime(mkProtocol(mkWorklogItem("04:10", "05:00"), mkItem()))));
+            assertNull(objUT.getEndTime(mkProtocol(mkItem("05:00", "06:00"), mkItem(null, null))));
             assertEquals("05:00", toHHmm(objUT.getEndTime(mkProtocol("04:10", "05:00"))));
+            assertEquals("02:22", toHHmm(objUT.getEndTime(mkProtocol(mkItem(null, "01:00"), mkItem(null, "02:22")))));
         });
     }
 
@@ -57,43 +51,40 @@ class TestTracProtocolInspector {
     void getTimeSpanInMinutes() {
         assertAll(() -> {
             assertEquals(-1, objUT.getTimeSpanInMinutes(mkProtocol()));
-            assertEquals(-1, objUT.getTimeSpanInMinutes(mkProtocol(mkItem())));
-            assertEquals(-1, objUT.getTimeSpanInMinutes(mkProtocol(mkWorklogItem(null, "01:00"))));
-            assertEquals(-1, objUT.getTimeSpanInMinutes(mkProtocol(mkWorklogItem("01:00", null))));
-            assertEquals(83, objUT.getTimeSpanInMinutes(mkProtocol(mkItem(), mkWorklogItem("05:00", "06:23"))));
-            assertEquals(83,
-                    objUT.getTimeSpanInMinutes(mkProtocol(mkItem(), mkWorklogItem("05:00", "06:23"), mkItem())));
-            assertEquals(120, objUT.getTimeSpanInMinutes(mkProtocol(mkWorklogItem("23:00", "01:00"))));
+            assertEquals(-1, objUT.getTimeSpanInMinutes(mkProtocol(mkItem(null, null))));
+            assertEquals(-1, objUT.getTimeSpanInMinutes(mkProtocol(mkItem(null, "01:00"))));
+            assertEquals(-1, objUT.getTimeSpanInMinutes(mkProtocol(mkItem("01:00", null))));
+            assertEquals(83, objUT.getTimeSpanInMinutes(mkProtocol(mkItem("05:00", "06:23"))));
+            assertEquals(120, objUT.getTimeSpanInMinutes(mkProtocol(mkItem("23:00", "01:00"))));
         });
 
     }
 
-    private ITracProtocol mkProtocol(ITracItem... items) {
-        ITracProtocol protocol = new TracProtocol();
+    private TracProtocol mkProtocol() {
+        return new TracProtocol();
+    }
 
-        protocol.getItems().addAll(Arrays.asList(items));
+    private TracProtocol mkProtocol(TracItem... items) {
+        TracProtocol protocol = new TracProtocol();
+
+        protocol.items().addAll(Arrays.asList(items));
 
         return protocol;
     }
 
-    private ITracProtocol mkProtocol(String startTime, String endTime) {
-        ITracProtocol protocol = new TracProtocol();
+    private TracProtocol mkProtocol(String startTime, String endTime) {
+        TracProtocol protocol = new TracProtocol();
 
-        protocol.getItems().add(mkWorklogItem(startTime, null));
-        protocol.getItems().add(mkWorklogItem(null, endTime));
+        protocol.items().add(mkItem(startTime, null));
+        protocol.items().add(mkItem(null, endTime));
 
         return protocol;
     }
 
-    private ITracItem mkItem() {
-        ITracItem item = mock(ITracItem.class);
-        return item;
-    }
-
-    private IWorklogItem mkWorklogItem(String startTime, String endTime) {
-        IWorklogItem item = mock(IWorklogItem.class);
-        when(item.getStartTime()).thenReturn(mkTime(startTime));
-        when(item.getEndTime()).thenReturn(mkTime(endTime));
+    private TracItem mkItem(String startTime, String endTime) {
+        TracItem item = mock(TracItem.class);
+        when(item.startTime()).thenReturn(mkTime(startTime));
+        when(item.endTime()).thenReturn(mkTime(endTime));
         return item;
     }
 
