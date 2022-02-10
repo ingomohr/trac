@@ -11,6 +11,7 @@ import org.hamcrest.DiagnosingMatcher;
 import org.hamcrest.Matcher;
 import org.ingomohr.trac.model.TracItem;
 import org.ingomohr.trac.model.TracProtocol;
+import org.ingomohr.trac.testutil.TracItemMatchers;
 import org.ingomohr.trac.util.TracItemInspector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,8 +46,8 @@ class TestDefaultTracReader {
         assertEquals("# My Protocol", protocol.title());
         assertEquals(2, protocol.items().size());
 
-        assertThat(protocol.items().get(0), isItem("09:00", "10:05", "One"));
-        assertThat(protocol.items().get(1), isItem("10:05", "11:00", "Two"));
+        assertThat(protocol.items().get(0), TracItemMatchers.isItem("09:00", "10:05", "One"));
+        assertThat(protocol.items().get(1), TracItemMatchers.isItem("10:05", "11:00", "Two"));
     }
 
 //
@@ -169,44 +170,5 @@ class TestDefaultTracReader {
 //        assertThat(p1.items().get(1), isWorkItem("07:32", "08:00", "Orga: D"));
 //    }
 //
-    private Matcher<TracItem> isItem(String start, String end, String message) {
-        return new DiagnosingMatcher<TracItem>() {
-
-            @Override
-            public void describeTo(Description description) {
-                describeItem(start, end, message, description);
-            }
-
-            @Override
-            protected boolean matches(Object obj, Description mismatchDescription) {
-                TracItem item = (TracItem) obj;
-
-                TracItemInspector inspector = new TracItemInspector();
-                String actualStart = inspector.getStartTimeAsString(item);
-                String actualEnd = inspector.getEndTimeAsString(item);
-                String actualText = item.text();
-
-                boolean matchesStart = Objects.equals(start, actualStart);
-                boolean matchesEnd = Objects.equals(end, actualEnd);
-                boolean matchesMsg = Objects.equals(message, actualText);
-
-                if (matchesStart && matchesEnd && matchesMsg) {
-                    return true;
-                } else {
-                    mismatchDescription.appendText("was ");
-                    describeItem(actualStart, actualEnd, actualText, mismatchDescription);
-                    return false;
-                }
-            }
-
-            private void describeItem(String actualStart, String actualEnd, String actualMessage,
-                    Description description) {
-                description.appendText(System.lineSeparator());
-                description.appendText("start: " + actualStart + System.lineSeparator());
-                description.appendText("end: " + actualEnd + System.lineSeparator());
-                description.appendText("message: <" + actualMessage + ">");
-            }
-        };
-    }
 
 }
