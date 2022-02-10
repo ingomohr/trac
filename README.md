@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/ingomohr/docwriter.svg?branch=master)](https://travis-ci.com/ingomohr/trac)
+![Build](https://github.com/ingomohr/trac/actions/workflows/maven.yml/badge.svg?branch=master)
 [![License](https://img.shields.io/badge/License-Apache%202.0-yellow.svg)](https://opensource.org/licenses/Apache-2.0)
 ### Motivation
 Trac is a small tool to read working time protocols and turn them into analyzable models.
