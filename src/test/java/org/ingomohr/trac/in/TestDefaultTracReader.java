@@ -2,14 +2,18 @@ package org.ingomohr.trac.in;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
+import org.hamcrest.CoreMatchers;
 import org.ingomohr.trac.model.TracItem;
 import org.ingomohr.trac.model.TracProtocol;
 import org.ingomohr.trac.testutil.TracItemMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class TestDefaultTracReader {
 
@@ -118,7 +122,9 @@ class TestDefaultTracReader {
     void read_HasOnlyComments_ProtocolHasNoItems() throws Exception {
         var doc = """
                 # Hello World
-                # This is a text
+                # The line below is also a comment
+                -------
+                # Another comment
                 """;
 
         List<TracProtocol> ps = objUT.read(doc);
@@ -132,13 +138,13 @@ class TestDefaultTracReader {
     void read_StartsAndEndsWithEmptyLine_EmptyLeadingAndTrailingLinesAreIgnored() throws Exception {
         var doc = """
 
-                One
+                # One
                 ---
                 08:00 Dev: Component A: So stuff
                 08:30 Orga: X: D
                 08:45-09:00 Review: R
 
-                Two
+                # Two
                 ---
                 07:32-08:00 Orga: D
 
@@ -148,14 +154,14 @@ class TestDefaultTracReader {
         assertEquals(2, ps.size());
 
         TracProtocol p0 = ps.get(0);
-        assertEquals("One", p0.title());
+        assertEquals("# One", p0.title());
         assertEquals(3, p0.items().size());
         assertThat(p0.items().get(0), TracItemMatchers.isItem("08:00", "08:30", "Dev: Component A: So stuff"));
         assertThat(p0.items().get(1), TracItemMatchers.isItem("08:30", "08:45", "Orga: X: D"));
         assertThat(p0.items().get(2), TracItemMatchers.isItem("08:45", "09:00", "Review: R"));
 
         TracProtocol p1 = ps.get(1);
-        assertEquals("Two", p1.title());
+        assertEquals("# Two", p1.title());
         assertEquals(1, p1.items().size());
         assertThat(p1.items().get(0), TracItemMatchers.isItem("07:32", "08:00", "Orga: D"));
     }
@@ -187,5 +193,78 @@ class TestDefaultTracReader {
         assertEquals(1, p1.items().size());
         assertThat(p1.items().get(0), TracItemMatchers.isItem("07:32", "08:00", "Orga: D"));
     }
+
+    @Test
+    void read_EntriesHaveLeadingAndTrailingWhiteSpaces_LeadingAndTrailingSpacesAreIgnored() throws Exception {
+        var doc = """
+                  # One
+                08:00 Dev: Component A: So stuff
+                   08:30 Orga: X: D
+                  08:45-09:00 Review: R
+                """;
+
+        List<TracProtocol> ps = objUT.read(doc);
+        assertEquals(1, ps.size());
+
+        TracProtocol p0 = ps.get(0);
+        assertEquals("# One", p0.title());
+        assertEquals(3, p0.items().size());
+        assertThat(p0.items().get(0), TracItemMatchers.isItem("08:00", "08:30", "Dev: Component A: So stuff"));
+        assertThat(p0.items().get(1), TracItemMatchers.isItem("08:30", "08:45", "Orga: X: D"));
+        assertThat(p0.items().get(2), TracItemMatchers.isItem("08:45", "09:00", "Review: R"));
+    }
+
+    @Test
+    void read_LastEntryHasNoEndTime_ShitInShitOutReadAsIs() throws Exception {
+        var doc = """
+                # Protocol X
+                08:00 One
+                09:00 Two
+                """;
+
+        List<TracProtocol> ps = objUT.read(doc);
+        assertEquals(1, ps.size());
+
+        TracProtocol p0 = ps.get(0);
+        assertEquals("# Protocol X", p0.title());
+        assertEquals(2, p0.items().size());
+        assertThat(p0.items().get(0), TracItemMatchers.isItem("08:00", "09:00", "One"));
+        assertThat(p0.items().get(1), TracItemMatchers.isItem("09:00", null, "Two"));
+    }
+
+    @Test
+    void read_EntryHasNegativeDuration_ShitInShitOutReadAsIs() throws Exception {
+        var doc = """
+                # Protocol X
+                08:00 One
+                07:00 Two
+                """;
+
+        List<TracProtocol> ps = objUT.read(doc);
+        assertEquals(1, ps.size());
+
+        TracProtocol p0 = ps.get(0);
+        assertEquals("# Protocol X", p0.title());
+        assertEquals(2, p0.items().size());
+        assertThat(p0.items().get(0), TracItemMatchers.isItem("08:00", "07:00", "One"));
+        assertThat(p0.items().get(1), TracItemMatchers.isItem("07:00", null, "Two"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "A", "07.00 Two", "07.0a Two" })
+    void read_EntryHasBadFormat_ReaderThrowsExceptionProvidingInfoOnLine(String line) throws Exception {
+        String rawDoc = """
+                # Protocol X
+                $(s)
+                # End
+                """;
+        String doc = rawDoc.replace("$(s)", line);
+
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> objUT.read(doc));
+        assertThat(ex.getMessage(),
+                CoreMatchers.containsString("Unsupported format: Cannot read line: '" + line + "'"));
+    }
+
+
 
 }

@@ -30,6 +30,9 @@ public class DefaultTracReader implements ITracReader {
     protected static final Pattern PATTERN_ITEM = Pattern
             .compile("([0-2][0-9]:[0-5][0-9])(-[0-2][0-9]:[0-5][0-9])?(.*)");
 
+    protected static final Pattern PATTERN_LINE = Pattern
+            .compile("(\\-)+");
+
     @Override
     public List<TracProtocol> read(String document) {
         requireNonNull(document, "Document cannot be null.");
@@ -100,10 +103,6 @@ public class DefaultTracReader implements ITracReader {
             for (int i = 0; i < lines.length; i++) {
                 final String line = lines[i].trim();
 
-                if (isEmptyLine(line)) {
-                    continue;
-                }
-
                 if (i == 0) {
                     protocol = new TracProtocol(line);
                 }
@@ -121,6 +120,8 @@ public class DefaultTracReader implements ITracReader {
                     }
 
                     predItem = item;
+                } else if (!line.startsWith("#") && !PATTERN_LINE.matcher(line).matches()) {
+                    throwCannotReadLine(line);
                 }
             }
         }
@@ -143,27 +144,23 @@ public class DefaultTracReader implements ITracReader {
         requireNonNull(timeConverter);
 
         int count = matcher.groupCount();
-
-        switch (count) {
-        case 3:
-
-            String start = matcher.group(1);
-            TemporalAccessor startTime = timeConverter.toTime(start);
-
-            TemporalAccessor endTime = null;
-            String end = matcher.group(2);
-            if (end != null && end.length() > 0) {
-                end = end.substring(1);
-                endTime = timeConverter.toTime(end);
-            }
-
-            String text = matcher.group(3).trim();
-
-            return new TracItem(startTime, endTime, text);
-
-        default:
-            throw new RuntimeException("Unsupported match: Cannot read line: '" + line + "'");
+        if (count != 3) {
+            throwCannotReadLine(line);
         }
+
+        String start = matcher.group(1);
+        TemporalAccessor startTime = timeConverter.toTime(start);
+
+        TemporalAccessor endTime = null;
+        String end = matcher.group(2);
+        if (end != null && end.length() > 0) {
+            end = end.substring(1);
+            endTime = timeConverter.toTime(end);
+        }
+
+        String text = matcher.group(3).trim();
+
+        return new TracItem(startTime, endTime, text);
 
     }
 
@@ -185,6 +182,10 @@ public class DefaultTracReader implements ITracReader {
      */
     protected boolean isEmptyLine(String line) {
         return line.length() == 0;
+    }
+
+    private void throwCannotReadLine(final String line) {
+        throw new RuntimeException("Unsupported format: Cannot read line: '" + line + "'");
     }
 
 }
