@@ -116,8 +116,8 @@ public class DefaultTracReader implements ITracReader {
                     protocol.items().add(item);
 
                     if (predItem != null && predItem.endTime() == null) {
-                        predItem = predItem.withEndTime(item.startTime());
-                        protocol.replaceItem(predItem, predItem);
+                        TracItem newPredItem = predItem.withEndTime(item.startTime());
+                        protocol.replaceItem(predItem, newPredItem);
                     }
 
                     predItem = item;

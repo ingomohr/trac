@@ -4,15 +4,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
-import java.util.Objects;
 
-import org.hamcrest.Description;
-import org.hamcrest.DiagnosingMatcher;
-import org.hamcrest.Matcher;
 import org.ingomohr.trac.model.TracItem;
 import org.ingomohr.trac.model.TracProtocol;
 import org.ingomohr.trac.testutil.TracItemMatchers;
-import org.ingomohr.trac.util.TracItemInspector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +27,7 @@ class TestDefaultTracReader {
     }
 
     @Test
-    void read_AdjacentWorklogItems_HasStartAndEndTimesSet() throws Exception {
+    void read_TwoItemsWithBothTimes_HasStartAndEndTimesSet() throws Exception {
         var doc = """
                 # My Protocol
                 09:00-10:05 One
@@ -46,29 +41,36 @@ class TestDefaultTracReader {
         assertEquals("# My Protocol", protocol.title());
         assertEquals(2, protocol.items().size());
 
-        assertThat(protocol.items().get(0), TracItemMatchers.isItem("09:00", "10:05", "One"));
-        assertThat(protocol.items().get(1), TracItemMatchers.isItem("10:05", "11:00", "Two"));
+        TracItem item0 = protocol.items().get(0);
+        TracItem item1 = protocol.items().get(1);
+
+        assertThat(item0, TracItemMatchers.isItem("09:00", "10:05", "One"));
+        assertThat(item1, TracItemMatchers.isItem("10:05", "11:00", "Two"));
     }
 
-//
-//    @Test
-//    void read_AdjacentWorklogItemsShortNotation_HasStartAndEndTimesSet() throws Exception {
-//        var doc = """
-//                09:00 One
-//                10:05-17:00 Two
-//                """;
-//
-//        List<TracProtocol> ps = objUT.read(doc);
-//        assertEquals(1, ps.size());
-//
-//        TracProtocol protocol = ps.get(0);
-//        assertEquals(null, protocol.getTitle());
-//        assertEquals(2, protocol.items().size());
-//
-//        assertThat(protocol.items().get(0), isWorkItem("09:00", "10:05", "One"));
-//        assertThat(protocol.items().get(1), isWorkItem("10:05", "17:00", "Two"));
-//    }
-//
+    @Test
+    void read_FirstItemHasNoEndTime_StartTimeOfSuccessorHasBeenAssignedAsEndTime() throws Exception {
+        var doc = """
+                # My Protocol
+                09:00 One
+                10:05-17:00 Two
+                """;
+
+        List<TracProtocol> ps = objUT.read(doc);
+
+        TracProtocol protocol = ps.get(0);
+        
+        assertEquals("# My Protocol", protocol.title());
+        assertEquals(2, protocol.items().size());
+
+        TracItem item0 = protocol.items().get(0);
+        TracItem item1 = protocol.items().get(1);
+
+        assertThat(item0, TracItemMatchers.isItem("09:00", "10:05", "One"));
+        assertThat(item1, TracItemMatchers.isItem("10:05", "17:00", "Two"));
+    }
+
+    //
 //    @Test
 //    void read_NonAdjacentWorklogItemsShortNotation_HasStartAndEndTimesSet() throws Exception {
 //        var doc = """
