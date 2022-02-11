@@ -59,7 +59,7 @@ class TestDefaultTracReader {
         List<TracProtocol> ps = objUT.read(doc);
 
         TracProtocol protocol = ps.get(0);
-        
+
         assertEquals("# My Protocol", protocol.title());
         assertEquals(2, protocol.items().size());
 
@@ -97,87 +97,95 @@ class TestDefaultTracReader {
         assertThat(item2, TracItemMatchers.isItem("11:00", "11:30", "Three"));
     }
 
-    //
-//    @Test
-//    void read_NoFirstComment_ProtocolHasNoTitle() throws Exception {
-//        var doc = """
-//                09:00 One
-//                """;
-//
-//        List<TracProtocol> ps = objUT.read(doc);
-//
-//        assertNull(ps.get(0).getTitle());
-//    }
-//
-//    @Test
-//    void read_HasFirstNonWorklogLine_ProtocolHasFirstLineAsTitle() throws Exception {
-//        var doc = """
-//                Hello World
-//                # This is a text
-//                """;
-//
-//        List<TracProtocol> ps = objUT.read(doc);
-//
-//        assertEquals("Hello World", (ps.get(0).getTitle()));
-//    }
-//
-//    @Test
-//    void read_StartsAndEndsWithEmptyLine_EmptyLeadingAndTrailingLinesAreIgnored() throws Exception {
-//        var doc = """
-//
-//                One
-//                ---
-//                08:00 Dev: Component A: So stuff
-//                08:30 Orga: X: D
-//                08:45-09:00 Review: R
-//
-//                Two
-//                ---
-//                07:32-08:00 Orga: D
-//
-//                """;
-//
-//        List<TracProtocol> ps = objUT.read(doc);
-//        assertEquals(2, ps.size());
-//
-//        TracProtocol p0 = ps.get(0);
-//        assertEquals("One", (p0.getTitle()));
-//        assertEquals(5, p0.items().size());
-//
-//        TracProtocol p1 = ps.get(1);
-//        assertEquals("Two", (p1.getTitle()));
-//        assertEquals(3, p1.items().size());
-//    }
-//
-//    @Test
-//    void read_HasDuplicateProtocols_AllProtocolsAreRead() throws Exception {
-//        var doc = """
-//                # One
-//                08:00 Dev: Component A: So stuff
-//                08:30 Orga: X: D
-//                08:45-09:00 Review: R
-//
-//                # Two
-//                07:32-08:00 Orga: D
-//                """;
-//
-//        List<TracProtocol> ps = objUT.read(doc);
-//        assertEquals(2, ps.size());
-//
-//        TracProtocol p0 = ps.get(0);
-//        assertEquals("# One", (p0.getTitle()));
-//        assertEquals(4, p0.items().size());
-//        assertThat(p0.items().get(0).getText(), CoreMatchers.is("# One"));
-//        assertThat(p0.items().get(1), isWorkItem("08:00", "08:30", "Dev: Component A: So stuff"));
-//        assertThat(p0.items().get(2), isWorkItem("08:30", "08:45", "Orga: X: D"));
-//        assertThat(p0.items().get(3), isWorkItem("08:45", "09:00", "Review: R"));
-//
-//        TracProtocol p1 = ps.get(1);
-//        assertEquals("# Two", (p1.getTitle()));
-//        assertEquals(2, p1.items().size());
-//        assertThat(p1.items().get(0).getText(), CoreMatchers.is("# Two"));
-//        assertThat(p1.items().get(1), isWorkItem("07:32", "08:00", "Orga: D"));
-//    }
-//
+    @Test
+    void read_NoFirstComment_FirstLineWasTakenAsTitle() throws Exception {
+        var doc = """
+                09:00 One
+                """;
+
+        List<TracProtocol> ps = objUT.read(doc);
+        assertEquals(1, ps.size());
+
+        TracProtocol protocol = ps.get(0);
+        assertEquals("09:00 One", protocol.title());
+        assertEquals(1, protocol.items().size());
+
+        TracItem item0 = protocol.items().get(0);
+        assertThat(item0, TracItemMatchers.isItem("09:00", null, "One"));
+    }
+
+    @Test
+    void read_HasOnlyComments_ProtocolHasNoItems() throws Exception {
+        var doc = """
+                # Hello World
+                # This is a text
+                """;
+
+        List<TracProtocol> ps = objUT.read(doc);
+
+        TracProtocol protocol = ps.get(0);
+        assertEquals("# Hello World", protocol.title());
+        assertEquals(0, protocol.items().size());
+    }
+
+    @Test
+    void read_StartsAndEndsWithEmptyLine_EmptyLeadingAndTrailingLinesAreIgnored() throws Exception {
+        var doc = """
+
+                One
+                ---
+                08:00 Dev: Component A: So stuff
+                08:30 Orga: X: D
+                08:45-09:00 Review: R
+
+                Two
+                ---
+                07:32-08:00 Orga: D
+
+                """;
+
+        List<TracProtocol> ps = objUT.read(doc);
+        assertEquals(2, ps.size());
+
+        TracProtocol p0 = ps.get(0);
+        assertEquals("One", p0.title());
+        assertEquals(3, p0.items().size());
+        assertThat(p0.items().get(0), TracItemMatchers.isItem("08:00", "08:30", "Dev: Component A: So stuff"));
+        assertThat(p0.items().get(1), TracItemMatchers.isItem("08:30", "08:45", "Orga: X: D"));
+        assertThat(p0.items().get(2), TracItemMatchers.isItem("08:45", "09:00", "Review: R"));
+
+        TracProtocol p1 = ps.get(1);
+        assertEquals("Two", p1.title());
+        assertEquals(1, p1.items().size());
+        assertThat(p1.items().get(0), TracItemMatchers.isItem("07:32", "08:00", "Orga: D"));
+    }
+
+    @Test
+    void read_HasMultipleProtocols_AllProtocolsAreRead() throws Exception {
+        var doc = """
+                # One
+                08:00 Dev: Component A: So stuff
+                08:30 Orga: X: D
+                08:45-09:00 Review: R
+
+                # Two
+                07:32-08:00 Orga: D
+                """;
+
+        List<TracProtocol> ps = objUT.read(doc);
+        assertEquals(2, ps.size());
+
+        TracProtocol p0 = ps.get(0);
+        assertEquals("# One", p0.title());
+        assertEquals(3, p0.items().size());
+        assertThat(p0.items().get(0), TracItemMatchers.isItem("08:00", "08:30", "Dev: Component A: So stuff"));
+        assertThat(p0.items().get(1), TracItemMatchers.isItem("08:30", "08:45", "Orga: X: D"));
+        assertThat(p0.items().get(2), TracItemMatchers.isItem("08:45", "09:00", "Review: R"));
+
+        TracProtocol p1 = ps.get(1);
+        assertEquals("# Two", p1.title());
+        assertEquals(1, p1.items().size());
+        assertThat(p1.items().get(0), TracItemMatchers.isItem("07:32", "08:00", "Orga: D"));
+    }
 
 }
