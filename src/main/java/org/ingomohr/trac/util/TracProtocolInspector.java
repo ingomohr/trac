@@ -10,7 +10,7 @@ import org.ingomohr.trac.model.TracItem;
 import org.ingomohr.trac.model.TracProtocol;
 
 /**
- * Computes information on an {@link TracProtocol}.
+ * Provides information on an {@link TracProtocol}.
  */
 public class TracProtocolInspector {
 

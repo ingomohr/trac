@@ -7,7 +7,7 @@ import java.time.temporal.TemporalAccessor;
 import org.ingomohr.trac.model.TracItem;
 
 /**
- * Computes information on {@link TracItem}s.
+ * Provides information on {@link TracItem}s.
  */
 public class TracItemInspector {
 
