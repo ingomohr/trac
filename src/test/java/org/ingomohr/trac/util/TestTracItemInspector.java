@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.TemporalAccessor;
 
 import org.ingomohr.trac.model.TracItem;
@@ -64,8 +62,7 @@ class TestTracItemInspector {
 
     private TemporalAccessor mkTime(String HHmm) {
         if (HHmm != null) {
-            DateTimeFormatter formatter = new DateTimeFormatterBuilder().appendPattern("HH:mm").toFormatter();
-            return formatter.parse(HHmm);
+            return new TimeConverter().toTime(HHmm);
         }
         return null;
     }
