@@ -22,6 +22,8 @@ import org.ingomohr.trac.util.TimeConverter;
  * <li>Considers lines starting with 'hh:mm' items with start time - and the end
  * time is the start time of the successor item</li>
  * <li>Considers the first line as document title</li>
+ * <li>Considers "#" as start of a line comment</li>
+ * <li>Considers "----" (lines of only dashes) as comment</li>
  * </ul>
  * </p>
  */
