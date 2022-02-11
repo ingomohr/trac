@@ -49,7 +49,7 @@ class TestDefaultTracReader {
     }
 
     @Test
-    void read_FirstItemHasNoEndTime_StartTimeOfSuccessorHasBeenAssignedAsEndTime() throws Exception {
+    void read_FirstItemHasNoEndTime_StartTimeOfSuccessorFollowUpHasBeenAssignedAsEndTime() throws Exception {
         var doc = """
                 # My Protocol
                 09:00 One
@@ -70,27 +70,34 @@ class TestDefaultTracReader {
         assertThat(item1, TracItemMatchers.isItem("10:05", "17:00", "Two"));
     }
 
+    @Test
+    void read_ProtocolHasCommentLines_CommentIsIgnored() throws Exception {
+        var doc = """
+                # My Protocol with comments
+                09:00 One
+                # some comment
+                10:05 Two
+                11:00-11:30 Three
+                # 12:00 this is a comment, too
+                """;
+
+        List<TracProtocol> ps = objUT.read(doc);
+        assertEquals(1, ps.size());
+
+        TracProtocol protocol = ps.get(0);
+        assertEquals("# My Protocol with comments", protocol.title());
+        assertEquals(3, protocol.items().size());
+
+        TracItem item0 = protocol.items().get(0);
+        TracItem item1 = protocol.items().get(1);
+        TracItem item2 = protocol.items().get(2);
+
+        assertThat(item0, TracItemMatchers.isItem("09:00", "10:05", "One"));
+        assertThat(item1, TracItemMatchers.isItem("10:05", "11:00", "Two"));
+        assertThat(item2, TracItemMatchers.isItem("11:00", "11:30", "Three"));
+    }
+
     //
-//    @Test
-//    void read_NonAdjacentWorklogItemsShortNotation_HasStartAndEndTimesSet() throws Exception {
-//        var doc = """
-//                09:00 One
-//                # some comment
-//                10:05 Two
-//                11:00-11:30 Three
-//                """;
-//
-//        List<TracProtocol> ps = objUT.read(doc);
-//        assertEquals(1, ps.size());
-//
-//        TracProtocol protocol = ps.get(0);
-//
-//        assertThat(protocol.items().get(0), isWorkItem("09:00", "10:05", "One"));
-//        assertThat(protocol.items().get(1), Matchers.isA(TracItem.class));
-//        assertThat(protocol.items().get(2), isWorkItem("10:05", "11:00", "Two"));
-//        assertThat(protocol.items().get(3), isWorkItem("11:00", "11:30", "Three"));
-//    }
-//
 //    @Test
 //    void read_NoFirstComment_ProtocolHasNoTitle() throws Exception {
 //        var doc = """
