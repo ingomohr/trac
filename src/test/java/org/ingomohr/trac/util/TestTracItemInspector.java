@@ -14,7 +14,7 @@ import org.ingomohr.trac.model.TracItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class TestTracWorklogItemInspector {
+class TestTracItemInspector {
 
     private TracItemInspector objUT;
 
