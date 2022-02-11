@@ -25,16 +25,12 @@ public class TestFileReader {
         List<String> lines = objUT.readAllLines(path);
 
         var expected = """
-                Mo
-                ---
-                08:27 Topic A
-                08:44-08:57 Topic B
-                09:25-45 Topic C: Topic C1
-
-                Di
-                -----
-                08:00 Topic A
-                08:30-10:30 Topic B""";
+                    So (Feb 6 2021)
+                    # some comment
+                    # MiniSets: 0
+                    # wfh
+                    ---
+                    01:38-02:15 Some content # + 0.75h Buffer""";
 
         assertEquals(expected, String.join(System.lineSeparator(), lines));
     }

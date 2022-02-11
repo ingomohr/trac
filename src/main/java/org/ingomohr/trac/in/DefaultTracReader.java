@@ -101,16 +101,27 @@ public class DefaultTracReader implements ITracReader {
             final String[] lines = document.split(System.lineSeparator());
 
             for (int i = 0; i < lines.length; i++) {
-                final String line = lines[i].trim();
+                String line = lines[i].trim();
 
-                if (i == 0) {
-                    protocol = new TracProtocol(line);
+                // Cut off trailing comments from line
+                int indexOfCommentChar = line.indexOf("#");
+                if (indexOfCommentChar > 0) {
+                    line = line.substring(0, indexOfCommentChar);
                 }
 
                 final Matcher workLogItemMatcher = PATTERN_ITEM.matcher(line);
-                final boolean isWorkItem = workLogItemMatcher.matches();
+                final boolean lineIsWorkItem = workLogItemMatcher.matches();
 
-                if (isWorkItem) {
+                if (i == 0) {
+                    if (!lineIsWorkItem) {
+                        protocol = new TracProtocol(line);
+                        continue;
+                    } else {
+                        protocol = new TracProtocol();
+                    }
+                }
+
+                if (lineIsWorkItem) {
                     TracItem item = readItem(workLogItemMatcher, line, timeConverter);
                     protocol.items().add(item);
 

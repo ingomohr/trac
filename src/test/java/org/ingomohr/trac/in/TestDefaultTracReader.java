@@ -75,6 +75,29 @@ class TestDefaultTracReader {
     }
 
     @Test
+    void read_FirstLineIsNeitherCommentNorItemLine_FirstLineIsProtocolTitle() throws Exception {
+        var doc = """
+                So (Feb 6 2021)
+                # some comment
+                # MiniSets: 0
+                # wfh
+                ---
+                01:38-02:15 Some content
+                """;
+
+        List<TracProtocol> ps = objUT.read(doc);
+
+        TracProtocol protocol = ps.get(0);
+
+        assertEquals("So (Feb 6 2021)", protocol.title());
+        assertEquals(1, protocol.items().size());
+
+        TracItem item0 = protocol.items().get(0);
+
+        assertThat(item0, TracItemMatchers.isItem("01:38", "02:15", "Some content"));
+    }
+
+    @Test
     void read_ProtocolHasCommentLines_CommentIsIgnored() throws Exception {
         var doc = """
                 # My Protocol with comments
@@ -102,7 +125,26 @@ class TestDefaultTracReader {
     }
 
     @Test
-    void read_NoFirstComment_FirstLineWasTakenAsTitle() throws Exception {
+    void read_WorkItemHasCommentSuffix_CommentIsIgnoredAndStringIsTrimmed() throws Exception {
+        var doc = """
+                # My Protocol with comments
+                09:00 One, two, thr #ee
+                """;
+
+        List<TracProtocol> ps = objUT.read(doc);
+        assertEquals(1, ps.size());
+
+        TracProtocol protocol = ps.get(0);
+        assertEquals("# My Protocol with comments", protocol.title());
+        assertEquals(1, protocol.items().size());
+
+        TracItem item0 = protocol.items().get(0);
+
+        assertThat(item0, TracItemMatchers.isItem("09:00", null, "One, two, thr"));
+    }
+
+    @Test
+    void read_DocStartsWithItemRightAway_ProtocolHasNoTitleBut() throws Exception {
         var doc = """
                 09:00 One
                 """;
@@ -111,7 +153,7 @@ class TestDefaultTracReader {
         assertEquals(1, ps.size());
 
         TracProtocol protocol = ps.get(0);
-        assertEquals("09:00 One", protocol.title());
+        assertEquals(null, protocol.title());
         assertEquals(1, protocol.items().size());
 
         TracItem item0 = protocol.items().get(0);
@@ -264,7 +306,5 @@ class TestDefaultTracReader {
         assertThat(ex.getMessage(),
                 CoreMatchers.containsString("Unsupported format: Cannot read line: '" + line + "'"));
     }
-
-
 
 }
