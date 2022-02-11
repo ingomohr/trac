@@ -144,7 +144,7 @@ class TestDefaultTracReader {
     }
 
     @Test
-    void read_DocStartsWithItemRightAway_ProtocolHasNoTitleBut() throws Exception {
+    void read_DocStartsWithItemRightAway_ProtocolHasNoTitleButItem() throws Exception {
         var doc = """
                 09:00 One
                 """;

@@ -116,10 +116,10 @@ public class DefaultTracReader implements ITracReader {
 
                 if (i == 0) {
                     if (!lineIsWorkItem) {
-                        protocol = new TracProtocol(line);
+                        protocol = createProtocol(line);
                         continue;
                     } else {
-                        protocol = new TracProtocol();
+                        protocol = createProtocol(null);
                     }
                 }
 
@@ -185,16 +185,6 @@ public class DefaultTracReader implements ITracReader {
      */
     protected TracProtocol createProtocol(String title) {
         return new TracProtocol(title);
-    }
-
-    /**
-     * Returns <code>true</code> if the given line is empty.
-     * 
-     * @param line the line to check.
-     * @return <code>true</code> if line is empty.
-     */
-    protected boolean isEmptyLine(String line) {
-        return line.length() == 0;
     }
 
     private void throwCannotReadLine(final String line) {
