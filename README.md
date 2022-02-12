@@ -16,11 +16,17 @@ A trac file is any text file that follows these rules:
     * Start times and End time is given as HH:mm
         * e.g. 23:15, 00:20
     * Work log entries with text "break" (case ignore) are considered as breaks
-### Work log entry format:
+### Work Log Entry Format:
 
 ``<HH:mm>-<HH:mm> <Entry text>``
 
+or (if there is a successor work log entry):
+
+``<HH:mm> <Entry text>``
+
 ## How to Run
+_For now, there is no release of Trac. You can, however, create a build and execute it._
+
 * Have Java 17 installed on your machine
 * Open your terminal and enter command:
 ```
@@ -33,6 +39,15 @@ java -jar trac-1.0-SNAPSHOT.jar -path /path/to/trac.txt -p timeSpent
             * start time
             * end time
             * effective working time
+
+### Alternative: Use the trac.sh
+The repo also contains a ``trac.sh`` which works on macOS (and should work on Linux, too).
+
+It accesses the build in the ``/target`` folder that is created when building the repo.
+
+```
+./trac.sh /path/to/trac.txt -p timeSpent
+```
 
 ### Example
 
