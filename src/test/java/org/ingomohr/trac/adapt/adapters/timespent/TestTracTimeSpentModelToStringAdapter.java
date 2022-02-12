@@ -29,8 +29,7 @@ public class TestTracTimeSpentModelToStringAdapter {
 
         String expected = """
                 # Time spent
-
-                    - no information found
+                no information found
                 """;
 
         String actual = objUT.adapt(new TracTimeSpentModel(Collections.emptyList()));
@@ -41,13 +40,9 @@ public class TestTracTimeSpentModelToStringAdapter {
     void adapt_ModelHasProtocol_ReturnsInfoForProtocol() {
         String expected = """
                 # Time spent
+                1. MyTitle (10:00-12:00) - EWT: 1h 0m
 
-                ## Protocol 1: MyTitle
-
-                    - Start               : 10:00
-                    - End                 : 12:00
-                    - Effective time spent: 1h 0m
-                        - i.e. w/o breaks
+                EWT: Effective working time (i.e. w/o breaks)
                 """;
 
         TracProtocol prot = new TracProtocol("MyTitle");
@@ -64,20 +59,10 @@ public class TestTracTimeSpentModelToStringAdapter {
     void adapt_ModelMultipleProtocolsTheSecondOfWhichHasNoValues_ReturnsInfosForAllProtocolsAndDisplaysNoInfoStringsForSecondProtocol() {
         String expected = """
                 # Time spent
+                1. MyTitle (10:00-12:00) - EWT: 1h 0m
+                2. <no title> (<no start time>-<no end time>) - EWT: <no duration>
 
-                ## Protocol 1: MyTitle
-
-                    - Start               : 10:00
-                    - End                 : 12:00
-                    - Effective time spent: 1h 0m
-                        - i.e. w/o breaks
-
-                ## Protocol 2: <no title>
-
-                    - Start               : <no start time>
-                    - End                 : <no end time>
-                    - Effective time spent: <no duration>
-                        - i.e. w/o breaks
+                EWT: Effective working time (i.e. w/o breaks)
                 """;
 
         TracProtocol prot0 = new TracProtocol("MyTitle");

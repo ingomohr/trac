@@ -27,24 +27,19 @@ public class TracTimeSpentModelToStringAdapter {
         if (!model.entries().isEmpty()) {
 
             for (TracTimeSpentModelEntry entry : model.entries()) {
-                builder.append(System.lineSeparator());
-
                 String title = adaptProtocolTitle(entry);
                 String start = adaptStartTime(entry);
                 String end = adaptEndTime(entry);
                 String effectiveDuration = adaptEffectiveDuration(entry);
 
-                builder.append("## Protocol ").append(counter++).append(": ").append(title)
-                        .append(System.lineSeparator()).append(System.lineSeparator());
-
-                builder.append("    - Start               : ").append(start).append(System.lineSeparator());
-                builder.append("    - End                 : ").append(end).append(System.lineSeparator());
-                builder.append("    - Effective time spent: ").append(effectiveDuration).append(System.lineSeparator());
-                builder.append("        - i.e. w/o breaks").append(System.lineSeparator());
+                builder.append(counter++).append(". ").append(title).append(" (").append(start).append("-").append(end)
+                        .append(") - EWT: ").append(effectiveDuration).append(System.lineSeparator());
             }
-        } else {
+
             builder.append(System.lineSeparator());
-            builder.append("    - no information found").append(System.lineSeparator());
+            builder.append("EWT: Effective working time (i.e. w/o breaks)").append(System.lineSeparator());
+        } else {
+            builder.append("no information found").append(System.lineSeparator());
         }
 
         return builder.toString();

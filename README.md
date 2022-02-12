@@ -76,22 +76,12 @@ java -jar trac-1.0-SNAPSHOT.jar -path /path/to/trac.txt -p timeSpent
 Result:
 ```
 Trac 1.0.0
+Trac 1.0.0
 # Time spent
+1. Tue (May 18 2021) (08:30-11:30) - EWT: 2h 30m
+2. Mo (May 17 2021) (08:30-10:00) - EWT: 1h 30m
 
-## Protocol 1: Tue (May 18 2021)
-
-    - Start               : 08:30
-    - End                 : 11:30
-    - Effective time spent: 2h 30m
-        - i.e. w/o breaks
-
-## Protocol 2: Mo (May 17 2021)
-
-    - Start               : 08:30
-    - End                 : 10:00
-    - Effective time spent: 1h 30m
-        - i.e. w/o breaks
-
+EWT: Effective working time (i.e. w/o breaks)
 ```
 
 ## How to Build
