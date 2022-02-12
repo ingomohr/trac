@@ -79,6 +79,13 @@ Trac 1.0.0
 
 ```
 
+## How to Build
+* Have Java 17 SDK installed
+* Have Maven installed
+* Open your terminal and call ``mvn package``
+    * This will build and test the code
+    * In the ``/target`` folder you'll find the JAR
+
 
 
 
