@@ -3,16 +3,15 @@ package org.ingomohr.trac;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.temporal.TemporalAccessor;
 import java.util.List;
 
+import org.ingomohr.trac.adapt.adapters.timespent.TracTimeSpentAdapter;
+import org.ingomohr.trac.adapt.adapters.timespent.TracTimeSpentModel;
+import org.ingomohr.trac.adapt.adapters.timespent.TracTimeSpentModelToStringAdapter;
 import org.ingomohr.trac.in.DefaultTracReader;
 import org.ingomohr.trac.in.ITracReader;
 import org.ingomohr.trac.model.TracProtocol;
 import org.ingomohr.trac.util.FileReader;
-import org.ingomohr.trac.util.TimeConverter;
-import org.ingomohr.trac.util.TimeDiffCalculator;
-import org.ingomohr.trac.util.TracProtocolInspector;
 
 /**
  * App class for use with terminal.
@@ -28,16 +27,41 @@ public class Trac {
 
         if (cfg.getPath() == null) {
             System.out.println("Please specify the file to read.");
-            System.out.println("- e.g. -path=my-protocols.txt");
+            System.out.println("- e.g. -path my-protocols.txt");
         } else {
 
-            try {
-                List<TracProtocol> protocols = readProtocols(cfg);
-                inspect(protocols, cfg);
-            } catch (IOException e) {
-                System.err.println("Cannot read protocols");
-                e.printStackTrace();
+            String[] adapterIDs = cfg.getAdapterIDs();
+            if (adapterIDs == null || adapterIDs.length == 0) {
+                System.out.println("Please specify trac profiles to use to inspect your protocol.");
+                System.out.println("- e.g. -p timeSpent");
+            } else {
+                try {
+                    List<TracProtocol> protocols = readProtocols(cfg);
+                    runAdapters(protocols, adapterIDs);
+
+                } catch (IOException e) {
+                    System.err.println("Error: " + e.getMessage());
+                }
             }
+        }
+    }
+
+    private static void runAdapters(List<TracProtocol> protocols, String[] adapterIDs) {
+        for (String adapterID : adapterIDs) {
+            runAdapter(protocols, adapterID);
+        }
+    }
+
+    private static void runAdapter(List<TracProtocol> protocols, String adapterID) {
+
+        // TODO this is why adapter => (model => ) String have to be generalized
+
+        if ("timeSpent".equals(adapterID)) {
+            TracTimeSpentModel model = new TracTimeSpentAdapter().adapt(protocols);
+            String str = new TracTimeSpentModelToStringAdapter().adapt(model);
+            System.out.println(str);
+        } else {
+            throw new RuntimeException("Unknown profile: " + adapterID);
         }
     }
 
@@ -51,38 +75,6 @@ public class Trac {
         ITracReader reader = new DefaultTracReader();
         List<TracProtocol> protocols = reader.read(doc);
         return protocols;
-    }
-
-    private static void inspect(List<TracProtocol> protocols, TracConfig cfg) {
-        if (cfg.isCountProtocols()) {
-            System.out.println("Number of protocols: " + protocols.size());
-        }
-
-        if (cfg.isPrintProtocolTitles()) {
-            int i = 1;
-            for (TracProtocol protocol : protocols) {
-                System.out.print(i++ + ": " + protocol.title());
-
-                TracProtocolInspector inspector = new TracProtocolInspector();
-                TemporalAccessor start = inspector.getStartTime(protocol);
-                TemporalAccessor end = inspector.getEndTime(protocol);
-
-                if (start != null && end != null) {
-                    TimeConverter converter = new TimeConverter();
-
-                    String startHHmm = converter.toHHmm(start);
-                    String endHHmm = converter.toHHmm(end);
-
-                    int minutes = new TimeDiffCalculator().getDiffInMinutes(start, end);
-                    String hhmm = converter.toHHmm(minutes);
-
-                    System.out.println("  (" + startHHmm + "-" + endHHmm + " => " + hhmm);
-                } else {
-                    System.out.println("  (Start or End time missing)");
-
-                }
-            }
-        }
     }
 
 }

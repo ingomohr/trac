@@ -1,7 +1,5 @@
 package org.ingomohr.trac;
 
-import java.util.Objects;
-
 /**
  * Configuration used to start Trac.
  * <p>
@@ -12,27 +10,43 @@ public class TracConfig {
 
     private String path;
 
-    private boolean countProtocols;
-
-    private boolean printProtocolTitles;
+    private String[] adapterIDs;
 
     public static TracConfig fromArgs(String[] args) {
         TracConfig config = new TracConfig();
 
+        boolean recordingPath = false;
+        boolean recordingAdapterIDs = false;
+
         for (String arg : args) {
-            if (arg.startsWith("-path=")) {
-                config.setPath(arg.substring("-path=".length()));
-            }
-            
-            if (Objects.equals("-countProtocols", arg)) {
-                config.setCountProtocols(true);
-            }
-            if (Objects.equals("-printProtocolTitles", arg)) {
-                config.setPrintProtocolTitles(true);
+
+            if ("-path".equals(arg)) {
+                recordingPath = true;
+                recordingAdapterIDs = false;
+            } else if ("-p".equals(arg)) {
+                recordingPath = false;
+                recordingAdapterIDs = true;
+            } else {
+                if (recordingPath) {
+                    config.setPath(arg);
+                } else if (recordingAdapterIDs) {
+                    config.setAdapterIDs(arg.split(","));
+                }
+
+                recordingPath = false;
+                recordingAdapterIDs = false;
             }
         }
 
         return config;
+    }
+
+    public String[] getAdapterIDs() {
+        return adapterIDs;
+    }
+
+    public void setAdapterIDs(String[] adapterIDs) {
+        this.adapterIDs = adapterIDs;
     }
 
     public String getPath() {
@@ -41,22 +55,6 @@ public class TracConfig {
 
     public void setPath(String path) {
         this.path = path;
-    }
-
-    public boolean isCountProtocols() {
-        return countProtocols;
-    }
-
-    public void setCountProtocols(boolean countProtocols) {
-        this.countProtocols = countProtocols;
-    }
-
-    public boolean isPrintProtocolTitles() {
-        return printProtocolTitles;
-    }
-
-    public void setPrintProtocolTitles(boolean printProtocolTitles) {
-        this.printProtocolTitles = printProtocolTitles;
     }
 
 }
