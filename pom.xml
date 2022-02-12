@@ -79,6 +79,10 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.22.2</version>
+				<configuration>
+					<!-- This makes sure that all locale-related tests work in any environment (e.g. CI on some machine in the cloud, too) -->
+					<argLine>-Duser.country=DE -Duser.language=de</argLine>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
