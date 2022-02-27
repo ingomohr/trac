@@ -31,7 +31,13 @@ public class DurationToStringConverter {
             builder.append(String.format("%,d", days)).append("d ");
         }
         if (hours > 0 || days > 0) {
+            if (hours < 10) {
+                builder.append(" ");
+            }
             builder.append(hours).append("h ");
+        }
+        if (minutes < 10) {
+            builder.append(" ");
         }
         builder.append(minutes).append("m");
 
