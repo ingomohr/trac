@@ -17,11 +17,11 @@ import org.ingomohr.trac.model.TracProtocol;
 public interface ITracAdapter<T> {
 
     /**
-     * Adapts the given protocols to the given target.
+     * Adapts the given protocols.
      * 
      * @param protocols the protocols to adapt. Cannot be <code>null</code>.
-     * @param target    the target to adapt to. Cannot be <code>null</code>.
+     * @return adapted model. Never <code>null</code>.
      */
-    void adapt(List<TracProtocol> protocols, T target);
+    T adapt(List<TracProtocol> protocols);
 
 }

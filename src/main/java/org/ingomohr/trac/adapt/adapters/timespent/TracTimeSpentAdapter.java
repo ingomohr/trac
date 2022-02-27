@@ -23,20 +23,20 @@ import org.ingomohr.trac.util.TracProtocolInspector;
  */
 public class TracTimeSpentAdapter implements ITracAdapter<TracTimeSpentModel> {
 
-    /**
-     * Adapts the given protocols into a new model.
-     * 
-     * @param protocols the protocols. Cannot be <code>null</code>.
-     * @return result model. Never <code>null</code>.
-     */
+    @Override
     public TracTimeSpentModel adapt(List<TracProtocol> protocols) {
         TracTimeSpentModel model = new TracTimeSpentModel(new ArrayList<>());
         adapt(protocols, model);
         return model;
     }
 
-    @Override
-    public void adapt(List<TracProtocol> protocols, TracTimeSpentModel target) {
+    /**
+     * Adapts the given protocols into the given target model.
+     * 
+     * @param protocols the protocols to adapt. Cannot be <code>null</code>.
+     * @param target    the target model. Cannot be <code>null</code>.
+     */
+    protected void adapt(List<TracProtocol> protocols, TracTimeSpentModel target) {
         Objects.requireNonNull(protocols);
         Objects.requireNonNull(target);
 
@@ -52,7 +52,6 @@ public class TracTimeSpentAdapter implements ITracAdapter<TracTimeSpentModel> {
 
             target.entries().add(entry);
         }
-
     }
 
     /**
