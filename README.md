@@ -91,13 +91,3 @@ EWT: Effective working time (i.e. w/o breaks)
     * This will build and test the code
     * In the ``/target`` folder you'll find the JAR
 
-
-
-
-
-
-
-
-
-
-
