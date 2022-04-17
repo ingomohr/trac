@@ -27,3 +27,4 @@ hs_err_pid*
 
 # Maven build artifacts
 target/
+/bin/
