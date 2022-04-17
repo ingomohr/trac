@@ -1,7 +1,6 @@
 package org.ingomohr.trac.adapt.adapters.timespent;
 
 import java.util.Objects;
-import java.util.stream.Stream;
 
 import org.ingomohr.trac.util.DurationToStringConverter;
 import org.ingomohr.trac.util.TimeConverter;
