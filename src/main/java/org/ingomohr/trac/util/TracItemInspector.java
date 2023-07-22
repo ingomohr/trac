@@ -66,4 +66,21 @@ public class TracItemInspector {
 		return null;
 	}
 
+	/**
+	 * Returns the duration of the given item as string.
+	 * 
+	 * @param item the item. Cannot be <code>null</code>.
+	 * @return duration as string representation. <code>null</code> if item has no
+	 *         duration.
+	 */
+	public String getDurationAsString(TracItem item) {
+		requireNonNull(item);
+
+		Duration duration = getDuration(item);
+		if (duration != null) {
+			return new DurationToStringConverter().toString(duration);
+		}
+		return null;
+	}
+
 }

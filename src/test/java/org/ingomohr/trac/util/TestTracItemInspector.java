@@ -53,6 +53,18 @@ class TestTracItemInspector {
 
 	}
 
+	@Test
+	void getDurationAsString() {
+		assertAll(() -> {
+
+			assertEquals(null, objUT.getDurationAsString(mkItem(null, null)));
+			assertEquals(null, objUT.getDurationAsString(mkItem(null, "05:00")));
+			assertEquals(null, objUT.getDurationAsString(mkItem("04:00", null)));
+			assertEquals("11h 24m", objUT.getDurationAsString(mkItem("04:00", "15:24")));
+		});
+
+	}
+
 	private TracItem mkItem(String startTime, String endTime) {
 		TracItem item = mock(TracItem.class);
 		when(item.startTime()).thenReturn(mkTime(startTime));
