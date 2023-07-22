@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import org.ingomohr.trac.model.TracItem;
 import org.ingomohr.trac.model.TracProtocol;
-import org.ingomohr.trac.util.TimeConverter;
+import org.ingomohr.trac.util.DurationCalculator;
 import org.ingomohr.trac.util.TracProtocolInspector;
 
 /**
@@ -63,7 +63,7 @@ public class DefaultTracTimeSpentAdapter implements TracTimeSpentAdapter {
 	protected Duration computeTimeSpentWithoutBreaks(List<TracItem> items) {
 		Duration overAllDuration = null;
 
-		final TimeConverter timeConverter = new TimeConverter();
+		final DurationCalculator calculator = new DurationCalculator();
 
 		for (int i = 0, n = items.size(); i < n; i++) {
 			TracItem item = items.get(i);
@@ -77,7 +77,7 @@ public class DefaultTracTimeSpentAdapter implements TracTimeSpentAdapter {
 							"Cannot compute duration. Item must have both start- and end time: " + item);
 				}
 
-				Duration duration = computeItemDuration(startTime, endTime, timeConverter);
+				Duration duration = calculator.calculateDuration(startTime, endTime);
 				if (overAllDuration == null) {
 					overAllDuration = duration;
 				} else {
@@ -87,26 +87,6 @@ public class DefaultTracTimeSpentAdapter implements TracTimeSpentAdapter {
 		}
 
 		return overAllDuration;
-	}
-
-	private Duration computeItemDuration(TemporalAccessor startTime, TemporalAccessor endTime,
-			TimeConverter timeConverter) {
-		int hours1 = timeConverter.getHours(startTime);
-		int mins1 = timeConverter.getMinutes(startTime);
-		int hours2 = timeConverter.getHours(endTime);
-		int mins2 = timeConverter.getMinutes(endTime);
-
-		if (mins2 < mins1) {
-			mins2 += 60;
-			hours2 -= 1;
-
-		}
-		if (hours2 < hours1) {
-			hours2 += 24;
-		}
-
-		Duration duration = Duration.ofHours(hours2 - hours1).plusMinutes(mins2 - mins1);
-		return duration;
 	}
 
 }
