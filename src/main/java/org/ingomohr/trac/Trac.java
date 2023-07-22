@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.ingomohr.trac.adapt.adapters.timespent.TracTimeSpentAdapter;
+import org.ingomohr.trac.adapt.adapters.timespent.DefaultTracTimeSpentAdapter;
 import org.ingomohr.trac.adapt.adapters.timespent.TracTimeSpentModel;
 import org.ingomohr.trac.adapt.adapters.timespent.TracTimeSpentModelToStringAdapter;
 import org.ingomohr.trac.in.DefaultTracReader;
@@ -57,7 +57,7 @@ public class Trac {
 		// TODO this is why adapter => (model => ) String have to be generalized
 
 		if ("timeSpent".equals(adapterID)) {
-			TracTimeSpentModel model = new TracTimeSpentAdapter().adapt(protocols);
+			TracTimeSpentModel model = new DefaultTracTimeSpentAdapter().adapt(protocols);
 			String str = new TracTimeSpentModelToStringAdapter().adapt(model);
 			System.out.println(str);
 		} else {

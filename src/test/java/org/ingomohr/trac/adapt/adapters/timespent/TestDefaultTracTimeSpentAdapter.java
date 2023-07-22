@@ -18,15 +18,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link TracTimeSpentAdapter}.
+ * Tests for {@link DefaultTracTimeSpentAdapter}.
  */
-public class TestTracTimeSpentAdapter {
+public class TestDefaultTracTimeSpentAdapter {
 
-	private TracTimeSpentAdapter objUT;
+	private DefaultTracTimeSpentAdapter objUT;
 
 	@BeforeEach
 	void prep() {
-		objUT = new TracTimeSpentAdapter();
+		objUT = new DefaultTracTimeSpentAdapter();
 	}
 
 	@Test
