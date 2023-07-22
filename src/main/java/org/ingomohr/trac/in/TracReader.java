@@ -7,7 +7,7 @@ import org.ingomohr.trac.model.TracProtocol;
 /**
  * Reads a trac input document into a list of {@link ITracProtocol}s.
  */
-public interface ITracReader {
+public interface TracReader {
 
 	/**
 	 * Reads the given document into {@link ITracProtocol}s.

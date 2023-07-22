@@ -9,7 +9,7 @@ import org.ingomohr.trac.adapt.adapters.timespent.TracTimeSpentAdapter;
 import org.ingomohr.trac.adapt.adapters.timespent.TracTimeSpentModel;
 import org.ingomohr.trac.adapt.adapters.timespent.TracTimeSpentModelToStringAdapter;
 import org.ingomohr.trac.in.DefaultTracReader;
-import org.ingomohr.trac.in.ITracReader;
+import org.ingomohr.trac.in.TracReader;
 import org.ingomohr.trac.model.TracProtocol;
 import org.ingomohr.trac.util.FileReader;
 
@@ -72,7 +72,7 @@ public class Trac {
 		List<String> lines = new FileReader().readAllLines(actualPath);
 		String doc = String.join(System.lineSeparator(), lines);
 
-		ITracReader reader = new DefaultTracReader();
+		TracReader reader = new DefaultTracReader();
 		List<TracProtocol> protocols = reader.read(doc);
 		return protocols;
 	}

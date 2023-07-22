@@ -13,7 +13,7 @@ import org.ingomohr.trac.model.TracProtocol;
 import org.ingomohr.trac.util.TimeConverter;
 
 /**
- * Standard implementation for {@link ITracReader}.
+ * Standard implementation for {@link TracReader}.
  * <p>
  * <ul>
  * <li>Considers empty lines as separators between protocols</li>
@@ -27,7 +27,7 @@ import org.ingomohr.trac.util.TimeConverter;
  * </ul>
  * </p>
  */
-public class DefaultTracReader implements ITracReader {
+public class DefaultTracReader implements TracReader {
 
 	protected static final Pattern PATTERN_ITEM = Pattern
 			.compile("([0-2][0-9]:[0-5][0-9])(-[0-2][0-9]:[0-5][0-9])?(.*)");
