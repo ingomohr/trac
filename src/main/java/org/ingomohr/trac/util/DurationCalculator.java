@@ -12,6 +12,10 @@ public class DurationCalculator {
 
 	/**
 	 * Returns the duration from a given start time to a given end time.
+	 * <p>
+	 * The returned duration is always positive. If the end time is smaller than the
+	 * start time, this assumes that the end time is located on the next day.
+	 * </p>
 	 * 
 	 * @param startTime the start time. Cannot be <code>null</code>.
 	 * @param endTime   the end time. Cannot be <code>null</code>.
