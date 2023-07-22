@@ -104,12 +104,6 @@ public class DefaultTracReader implements TracReader {
 			for (int i = 0; i < lines.length; i++) {
 				String line = lines[i].trim();
 
-				// Cut off trailing comments from line
-				int indexOfCommentChar = line.indexOf("#");
-				if (indexOfCommentChar > 0) {
-					line = line.substring(0, indexOfCommentChar);
-				}
-
 				final Matcher workLogItemMatcher = PATTERN_ITEM.matcher(line);
 				final boolean lineIsWorkItem = workLogItemMatcher.matches();
 

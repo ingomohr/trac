@@ -124,8 +124,12 @@ class TestDefaultTracReader {
 		assertThat(item2, TracItemMatchers.isItem("11:00", "11:30", "Three"));
 	}
 
+	/**
+	 * Comments in a work item (i.e. an item with a start time and optionally an end
+	 * time) shall NOT be ignored.
+	 */
 	@Test
-	void read_WorkItemHasCommentSuffix_CommentIsIgnoredAndStringIsTrimmed() throws Exception {
+	void read_WorkItemHasCommentSuffix_CommentIsNotIgnoredAndStringIsTrimmed() throws Exception {
 		var doc = """
 				# My Protocol with comments
 				09:00 One, two, thr #ee
@@ -140,7 +144,7 @@ class TestDefaultTracReader {
 
 		TracItem item0 = protocol.items().get(0);
 
-		assertThat(item0, TracItemMatchers.isItem("09:00", null, "One, two, thr"));
+		assertThat(item0, TracItemMatchers.isItem("09:00", null, "One, two, thr #ee"));
 	}
 
 	@Test
