@@ -14,7 +14,7 @@ import org.ingomohr.trac.model.TracProtocol;
  * @param <T> the target type.
  */
 @FunctionalInterface
-public interface ITracAdapter<T> {
+public interface TracAdapter<T> {
 
 	/**
 	 * Adapts the given protocols.

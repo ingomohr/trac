@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.ingomohr.trac.adapt.ITracAdapter;
+import org.ingomohr.trac.adapt.TracAdapter;
 import org.ingomohr.trac.model.TracItem;
 import org.ingomohr.trac.model.TracProtocol;
 import org.ingomohr.trac.util.TimeConverter;
@@ -21,7 +21,7 @@ import org.ingomohr.trac.util.TracProtocolInspector;
  * of "Break" (ignore case) are ignored)
  * </ul>
  */
-public class TracTimeSpentAdapter implements ITracAdapter<TracTimeSpentModel> {
+public class TracTimeSpentAdapter implements TracAdapter<TracTimeSpentModel> {
 
 	@Override
 	public TracTimeSpentModel adapt(List<TracProtocol> protocols) {
