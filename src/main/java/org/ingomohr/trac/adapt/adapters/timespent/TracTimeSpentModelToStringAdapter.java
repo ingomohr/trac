@@ -1,5 +1,7 @@
 package org.ingomohr.trac.adapt.adapters.timespent;
 
+import java.time.Duration;
+import java.util.List;
 import java.util.Objects;
 
 import org.ingomohr.trac.adapt.ModelToStringAdapter;
@@ -23,6 +25,10 @@ public class TracTimeSpentModelToStringAdapter implements ModelToStringAdapter<T
 
 		StringBuilder builder = new StringBuilder();
 		builder.append("# Time spent").append(System.lineSeparator());
+
+		String totalEffectiveDuration = calculateTotalDuration(model);
+		builder.append("Total (EWT): " + totalEffectiveDuration);
+		builder.append(System.lineSeparator());
 
 		if (!model.entries().isEmpty()) {
 
@@ -68,6 +74,27 @@ public class TracTimeSpentModelToStringAdapter implements ModelToStringAdapter<T
 		}
 
 		return builder.toString();
+	}
+
+	private String calculateTotalDuration(TracTimeSpentModel model) {
+		Duration totalDuration = null;
+
+		List<TracTimeSpentModelEntry> entries = model.entries();
+		for (TracTimeSpentModelEntry tracTimeSpentModelEntry : entries) {
+			Duration duration = tracTimeSpentModelEntry.effectiveDuration();
+
+			if (totalDuration == null) {
+				totalDuration = duration;
+			} else if (duration != null) {
+				totalDuration = totalDuration.plus(duration);
+			}
+		}
+
+		if (totalDuration != null) {
+			return new DurationToStringConverter().toString(totalDuration);
+		}
+
+		return "-";
 	}
 
 	private String mkSeparatorLine(int initialWidth, int[] colWidths) {
@@ -174,8 +201,8 @@ public class TracTimeSpentModelToStringAdapter implements ModelToStringAdapter<T
 	}
 
 	private String adaptEffectiveDuration(TracTimeSpentModelEntry entry) {
-		if (entry.timeSpent() != null) {
-			return new DurationToStringConverter().toString(entry.timeSpent());
+		if (entry.effectiveDuration() != null) {
+			return new DurationToStringConverter().toString(entry.effectiveDuration());
 		}
 
 		return "<no duration>";

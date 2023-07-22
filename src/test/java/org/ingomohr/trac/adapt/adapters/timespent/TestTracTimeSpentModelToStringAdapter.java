@@ -29,6 +29,7 @@ public class TestTracTimeSpentModelToStringAdapter {
 
 		String expected = """
 				# Time spent
+				Total (EWT): -
 				no information found
 				""";
 
@@ -40,6 +41,7 @@ public class TestTracTimeSpentModelToStringAdapter {
 	void adapt_ModelHasProtocol_ReturnsInfoForProtocol() {
 		String expected = """
 				# Time spent
+				Total (EWT):  1h  0m
 				------------------------------------------
 				  1. MyTitle 10:00 - 12:00 -- EWT:  1h  0m
 
@@ -61,6 +63,7 @@ public class TestTracTimeSpentModelToStringAdapter {
 	void adapt_ModelMultipleProtocolsTheSecondOfWhichHasNoValues_ReturnsInfosForAllProtocolsAndDisplaysNoInfoStringsForSecondProtocol() {
 		String expected = """
 				# Time spent
+				Total (EWT):  1h  0m
 				---------------------------------------------------------------------
 				  1. MyTitle    10:00           - 12:00         -- EWT:        1h  0m
 				  2. <no title> <no start time> - <no end time> -- EWT: <no duration>

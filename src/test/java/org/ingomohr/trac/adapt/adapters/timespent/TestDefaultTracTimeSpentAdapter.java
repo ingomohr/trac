@@ -44,7 +44,7 @@ public class TestDefaultTracTimeSpentAdapter {
 		TracTimeSpentModelEntry e0 = model.entries().get(0);
 		assertEquals(null, e0.endTime());
 		assertEquals(null, e0.startTime());
-		assertEquals(null, e0.timeSpent());
+		assertEquals(null, e0.effectiveDuration());
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class TestDefaultTracTimeSpentAdapter {
 		assertEquals("11:00", toHHmm(e0.startTime()));
 		assertEquals("12:30", toHHmm(e0.endTime()));
 
-		assertEquals(90, e0.timeSpent().toMinutes());
+		assertEquals(90, e0.effectiveDuration().toMinutes());
 	}
 
 	@Test
@@ -99,7 +99,7 @@ public class TestDefaultTracTimeSpentAdapter {
 		assertEquals("11:00", toHHmm(e0.startTime()));
 		assertEquals("13:15", toHHmm(e0.endTime()));
 
-		assertEquals(135, e0.timeSpent().toMinutes());
+		assertEquals(135, e0.effectiveDuration().toMinutes());
 	}
 
 	@Test
@@ -118,7 +118,7 @@ public class TestDefaultTracTimeSpentAdapter {
 		assertEquals("11:00", toHHmm(e0.startTime()));
 		assertEquals("13:15", toHHmm(e0.endTime()));
 
-		assertEquals(60, e0.timeSpent().toMinutes());
+		assertEquals(60, e0.effectiveDuration().toMinutes());
 	}
 
 	@Test
@@ -137,7 +137,7 @@ public class TestDefaultTracTimeSpentAdapter {
 		assertEquals("23:00", toHHmm(e0.startTime()));
 		assertEquals("01:05", toHHmm(e0.endTime()));
 
-		assertEquals(110, e0.timeSpent().toMinutes());
+		assertEquals(110, e0.effectiveDuration().toMinutes());
 	}
 
 	@Test
@@ -157,7 +157,7 @@ public class TestDefaultTracTimeSpentAdapter {
 		assertEquals("23:00", toHHmm(e0.startTime()));
 		assertEquals("01:35", toHHmm(e0.endTime()));
 
-		assertEquals(105, e0.timeSpent().toMinutes());
+		assertEquals(105, e0.effectiveDuration().toMinutes());
 	}
 
 	/**
@@ -181,7 +181,7 @@ public class TestDefaultTracTimeSpentAdapter {
 		assertEquals("23:00", toHHmm(e0.startTime()));
 		assertEquals("01:35", toHHmm(e0.endTime()));
 
-		assertEquals(105, e0.timeSpent().toMinutes());
+		assertEquals(105, e0.effectiveDuration().toMinutes());
 	}
 
 	@Test
@@ -216,13 +216,13 @@ public class TestDefaultTracTimeSpentAdapter {
 		assertSame(ps.get(0), e0.protocol());
 		assertEquals("10:30", toHHmm(e0.startTime()));
 		assertEquals("13:00", toHHmm(e0.endTime()));
-		assertEquals(105, e0.timeSpent().toMinutes());
+		assertEquals(105, e0.effectiveDuration().toMinutes());
 
 		TracTimeSpentModelEntry e1 = model.entries().get(1);
 		assertSame(ps.get(1), e1.protocol());
 		assertEquals("10:45", toHHmm(e1.startTime()));
 		assertEquals("11:15", toHHmm(e1.endTime()));
-		assertEquals(30, e1.timeSpent().toMinutes());
+		assertEquals(30, e1.effectiveDuration().toMinutes());
 	}
 
 	private String toHHmm(TemporalAccessor time) {

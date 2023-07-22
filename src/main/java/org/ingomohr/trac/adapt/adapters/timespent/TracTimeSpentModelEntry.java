@@ -17,6 +17,6 @@ public record TracTimeSpentModelEntry(
 
 		TemporalAccessor endTime,
 
-		Duration timeSpent) {
+		Duration effectiveDuration) {
 
 }
