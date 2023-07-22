@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import org.ingomohr.trac.model.TracItem;
 import org.ingomohr.trac.model.TracProtocol;
-import org.ingomohr.trac.util.DurationCalculator;
+import org.ingomohr.trac.util.TracItemInspector;
 import org.ingomohr.trac.util.TracProtocolInspector;
 
 /**
@@ -63,12 +63,20 @@ public class DefaultTracTimeSpentAdapter implements TracTimeSpentAdapter {
 	protected Duration computeTimeSpentWithoutBreaks(List<TracItem> items) {
 		Duration overAllDuration = null;
 
-		final DurationCalculator calculator = new DurationCalculator();
-
 		for (int i = 0, n = items.size(); i < n; i++) {
 			TracItem item = items.get(i);
 
-			if (!"break".equalsIgnoreCase(item.text())) {
+			TracItemInspector inspector = new TracItemInspector();
+			final Duration dur = inspector.getDuration(item);
+			String text = item.text();
+
+			if (text.contains("#")) {
+				String textWithoutComment = text.substring(0, text.indexOf("#"));
+				textWithoutComment = textWithoutComment.trim();
+				text = textWithoutComment;
+			}
+
+			if (!("break".equalsIgnoreCase(text)) && !text.isEmpty()) {
 				TemporalAccessor startTime = item.startTime();
 				TemporalAccessor endTime = item.endTime();
 
@@ -77,11 +85,10 @@ public class DefaultTracTimeSpentAdapter implements TracTimeSpentAdapter {
 							"Cannot compute duration. Item must have both start- and end time: " + item);
 				}
 
-				Duration duration = calculator.calculateDuration(startTime, endTime);
 				if (overAllDuration == null) {
-					overAllDuration = duration;
+					overAllDuration = dur;
 				} else {
-					overAllDuration = overAllDuration.plusMinutes(duration.toMinutes());
+					overAllDuration = overAllDuration.plusMinutes(dur.toMinutes());
 				}
 			}
 		}

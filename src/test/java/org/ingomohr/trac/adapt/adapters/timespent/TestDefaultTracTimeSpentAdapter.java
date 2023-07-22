@@ -160,6 +160,30 @@ public class TestDefaultTracTimeSpentAdapter {
 		assertEquals(105, e0.timeSpent().toMinutes());
 	}
 
+	/**
+	 * When buffer time was taken - e.g. "# -1h Buffer", the corresponding item
+	 * shall count as break.
+	 */
+	@Test
+	void adapt_SingleProtocolWithBufferTimeBookings_BufferIsIgnored() {
+		String rawP0 = """
+				One
+				23:00-00:15 Something
+				00:30-01:05 # this is some buffer time taken -> represents a break
+				01:05-01:35 Something else
+				""";
+
+		TracProtocol p0 = readSingleProtocol(rawP0);
+		TracTimeSpentModel model = objUT.adapt(Arrays.asList(p0));
+
+		assertEquals(1, model.entries().size());
+		TracTimeSpentModelEntry e0 = model.entries().get(0);
+		assertEquals("23:00", toHHmm(e0.startTime()));
+		assertEquals("01:35", toHHmm(e0.endTime()));
+
+		assertEquals(105, e0.timeSpent().toMinutes());
+	}
+
 	@Test
 	void adapt_SingleProtocol_ReturnedEntryHoldProtocol() {
 		String rawP0 = """
