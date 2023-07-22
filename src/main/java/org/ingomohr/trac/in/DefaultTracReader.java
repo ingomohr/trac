@@ -29,166 +29,181 @@ import org.ingomohr.trac.util.TimeConverter;
  */
 public class DefaultTracReader implements ITracReader {
 
-    protected static final Pattern PATTERN_ITEM = Pattern
-            .compile("([0-2][0-9]:[0-5][0-9])(-[0-2][0-9]:[0-5][0-9])?(.*)");
+	protected static final Pattern PATTERN_ITEM = Pattern
+			.compile("([0-2][0-9]:[0-5][0-9])(-[0-2][0-9]:[0-5][0-9])?(.*)");
 
-    protected static final Pattern PATTERN_LINE = Pattern
-            .compile("(\\-)+");
+	protected static final Pattern PATTERN_LINE = Pattern.compile("(\\-)+");
 
-    @Override
-    public List<TracProtocol> read(String document) {
-        requireNonNull(document, "Document cannot be null.");
+	@Override
+	public List<TracProtocol> read(String document) {
+		requireNonNull(document, "Document cannot be null.");
 
-        final List<TracProtocol> protocols = new ArrayList<TracProtocol>();
+		final List<TracProtocol> protocols = new ArrayList<TracProtocol>();
 
-        if (!document.isEmpty()) {
-            String[] lines = document.split(System.lineSeparator());
+		if (!document.isEmpty()) {
+			String[] lines = document.split(System.lineSeparator());
 
-            List<String> protocolChunks = toProtocolChunks(lines);
+			List<String> protocolChunks = toProtocolChunks(lines);
 
-            for (String chunk : protocolChunks) {
-                TracProtocol protocol = readProtocol(chunk);
-                protocols.add(protocol);
-            }
-        }
+			for (String chunk : protocolChunks) {
+				TracProtocol protocol = readProtocol(chunk);
+				protocols.add(protocol);
+			}
+		}
 
-        return protocols;
-    }
+		return protocols;
+	}
 
-    /**
-     * Turns the given lines into protocol chunks. Each of the chunks contains all
-     * lines of one protocol.
-     * <p>
-     * The standard implementation considers every empty line as separator between
-     * protocols.
-     * </p>
-     * 
-     * @param lines the lines to turn into protocol chunks. Cannot be
-     *              <code>null</code>.
-     * @return protocol chunks. Never <code>null</code>, possibly empty.
-     */
-    protected List<String> toProtocolChunks(String[] lines) {
-        final List<String> chunks = new ArrayList<String>();
+	/**
+	 * Turns the given lines into protocol chunks. Each of the chunks contains all
+	 * lines of one protocol.
+	 * <p>
+	 * The standard implementation considers every empty line as separator between
+	 * protocols.
+	 * </p>
+	 * 
+	 * @param lines the lines to turn into protocol chunks. Cannot be
+	 *              <code>null</code>.
+	 * @return protocol chunks. Never <code>null</code>, possibly empty.
+	 */
+	protected List<String> toProtocolChunks(String[] lines) {
+		final List<String> chunks = new ArrayList<String>();
 
-        StringBuilder builder = new StringBuilder();
+		StringBuilder builder = new StringBuilder();
 
-        for (String line : requireNonNull(lines)) {
+		for (String line : requireNonNull(lines)) {
 
-            if (line.trim().isEmpty()) {
-                if (builder.length() > 0) {
-                    chunks.add(builder.toString());
-                    builder = new StringBuilder();
-                }
-            } else {
-                builder.append(line).append(System.lineSeparator());
-            }
-        }
+			if (line.trim().isEmpty()) {
+				if (builder.length() > 0) {
+					chunks.add(builder.toString());
+					builder = new StringBuilder();
+				}
+			} else {
+				builder.append(line).append(System.lineSeparator());
+			}
+		}
 
-        if (builder.length() > 0) {
-            chunks.add(builder.toString());
-        }
+		if (builder.length() > 0) {
+			chunks.add(builder.toString());
+		}
 
-        return chunks;
-    }
+		return chunks;
+	}
 
-    protected TracProtocol readProtocol(String document) {
+	protected TracProtocol readProtocol(String document) {
 
-        final TimeConverter timeConverter = new TimeConverter();
+		final TimeConverter timeConverter = new TimeConverter();
 
-        TracItem predItem = null;
+		TracItem predItem = null;
 
-        TracProtocol protocol = null;
+		TracProtocol protocol = null;
 
-        if (!document.isEmpty()) {
-            final String[] lines = document.split(System.lineSeparator());
+		if (!document.isEmpty()) {
+			final String[] lines = document.split(System.lineSeparator());
 
-            for (int i = 0; i < lines.length; i++) {
-                String line = lines[i].trim();
+			for (int i = 0; i < lines.length; i++) {
+				String line = lines[i].trim();
 
-                // Cut off trailing comments from line
-                int indexOfCommentChar = line.indexOf("#");
-                if (indexOfCommentChar > 0) {
-                    line = line.substring(0, indexOfCommentChar);
-                }
+				// Cut off trailing comments from line
+				int indexOfCommentChar = line.indexOf("#");
+				if (indexOfCommentChar > 0) {
+					line = line.substring(0, indexOfCommentChar);
+				}
 
-                final Matcher workLogItemMatcher = PATTERN_ITEM.matcher(line);
-                final boolean lineIsWorkItem = workLogItemMatcher.matches();
+				final Matcher workLogItemMatcher = PATTERN_ITEM.matcher(line);
+				final boolean lineIsWorkItem = workLogItemMatcher.matches();
 
-                if (i == 0) {
-                    if (!lineIsWorkItem) {
-                        protocol = createProtocol(line);
-                        continue;
-                    } else {
-                        protocol = createProtocol(null);
-                    }
-                }
+				if (i == 0) {
+					if (!lineIsWorkItem) {
+						protocol = createProtocol(line);
+						continue;
+					} else {
+						protocol = createProtocol(null);
+					}
+				}
 
-                if (lineIsWorkItem) {
-                    TracItem item = readItem(workLogItemMatcher, line, timeConverter);
-                    protocol.items().add(item);
+				if (lineIsWorkItem) {
+					TracItem item = readItem(workLogItemMatcher, line, timeConverter);
+					protocol.items().add(item);
 
-                    if (predItem != null && predItem.endTime() == null) {
-                        TracItem newPredItem = predItem.withEndTime(item.startTime());
-                        protocol.replaceItem(predItem, newPredItem);
-                    }
+					if (predItem != null && predItem.endTime() == null) {
+						TracItem newPredItem = withEndTime(predItem, item.startTime());
+						replaceItem(protocol, predItem, newPredItem);
+					}
 
-                    predItem = item;
-                } else if (!line.startsWith("#") && !PATTERN_LINE.matcher(line).matches()) {
-                    throwCannotReadLine(line);
-                }
-            }
-        }
+					predItem = item;
+				} else if (!line.startsWith("#") && !PATTERN_LINE.matcher(line).matches()) {
+					throwCannotReadLine(line);
+				}
+			}
+		}
 
-        return protocol;
-    }
+		return protocol;
+	}
 
-    /**
-     * Reads the given line into a {@link TracItem}.
-     * 
-     * @param matcher       the matcher for the given line. Cannot be
-     *                      <code>null</code>.
-     * @param line          the line to read. Cannot be <code>null</code>.
-     * @param timeConverter the {@link TimeConverter} to use. Cannot be
-     *                      <code>null</code>.
-     */
-    protected TracItem readItem(Matcher matcher, String line, TimeConverter timeConverter) {
-        requireNonNull(matcher);
-        requireNonNull(line);
-        requireNonNull(timeConverter);
+	/**
+	 * Reads the given line into a {@link TracItem}.
+	 * 
+	 * @param matcher       the matcher for the given line. Cannot be
+	 *                      <code>null</code>.
+	 * @param line          the line to read. Cannot be <code>null</code>.
+	 * @param timeConverter the {@link TimeConverter} to use. Cannot be
+	 *                      <code>null</code>.
+	 */
+	protected TracItem readItem(Matcher matcher, String line, TimeConverter timeConverter) {
+		requireNonNull(matcher);
+		requireNonNull(line);
+		requireNonNull(timeConverter);
 
-        int count = matcher.groupCount();
-        if (count != 3) {
-            throwCannotReadLine(line);
-        }
+		int count = matcher.groupCount();
+		if (count != 3) {
+			throwCannotReadLine(line);
+		}
 
-        String start = matcher.group(1);
-        TemporalAccessor startTime = timeConverter.toTime(start);
+		String start = matcher.group(1);
+		TemporalAccessor startTime = timeConverter.toTime(start);
 
-        TemporalAccessor endTime = null;
-        String end = matcher.group(2);
-        if (end != null && end.length() > 0) {
-            end = end.substring(1);
-            endTime = timeConverter.toTime(end);
-        }
+		TemporalAccessor endTime = null;
+		String end = matcher.group(2);
+		if (end != null && end.length() > 0) {
+			end = end.substring(1);
+			endTime = timeConverter.toTime(end);
+		}
 
-        String text = matcher.group(3).trim();
+		String text = matcher.group(3).trim();
 
-        return new TracItem(startTime, endTime, text);
+		return new TracItem(startTime, endTime, text);
 
-    }
+	}
 
-    /**
-     * Creates a new {@link TracProtocol}.
-     * 
-     * @param title the protocol title to set.
-     * @return new protocol. Never <code>null</code>.
-     */
-    protected TracProtocol createProtocol(String title) {
-        return new TracProtocol(title);
-    }
+	/**
+	 * Creates a new {@link TracProtocol}.
+	 * 
+	 * @param title the protocol title to set.
+	 * @return new protocol. Never <code>null</code>.
+	 */
+	protected TracProtocol createProtocol(String title) {
+		return new TracProtocol(title);
+	}
 
-    private void throwCannotReadLine(final String line) {
-        throw new RuntimeException("Unsupported format: Cannot read line: '" + line + "'");
-    }
+	private void throwCannotReadLine(final String line) {
+		throw new RuntimeException("Unsupported format: Cannot read line: '" + line + "'");
+	}
+
+	private TracItem withEndTime(TracItem item, TemporalAccessor endTime) {
+		return new TracItem(item.startTime(), endTime, item.text());
+	}
+
+	private void replaceItem(TracProtocol protocol, TracItem item, TracItem newItem) {
+		requireNonNull(item);
+		requireNonNull(newItem);
+
+		protocol.items().replaceAll((a) -> {
+			if (a == item) {
+				return newItem;
+			}
+			return a;
+		});
+	}
 
 }
