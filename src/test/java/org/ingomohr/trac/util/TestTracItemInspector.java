@@ -42,13 +42,13 @@ class TestTracItemInspector {
 	}
 
 	@Test
-	void getTimeSpentInMinutes() {
+	void getDuration() {
 		assertAll(() -> {
 
-			assertEquals(-1, objUT.getTimeSpentInMinutes(mkItem(null, null)));
-			assertEquals(-1, objUT.getTimeSpentInMinutes(mkItem(null, "05:00")));
-			assertEquals(-1, objUT.getTimeSpentInMinutes(mkItem("04:00", null)));
-			assertEquals(84, objUT.getTimeSpentInMinutes(mkItem("04:00", "05:24")));
+			assertEquals(null, objUT.getDuration(mkItem(null, null)));
+			assertEquals(null, objUT.getDuration(mkItem(null, "05:00")));
+			assertEquals(null, objUT.getDuration(mkItem("04:00", null)));
+			assertEquals(84, objUT.getDuration(mkItem("04:00", "05:24")).toMinutes());
 		});
 
 	}

@@ -2,6 +2,7 @@ package org.ingomohr.trac.util;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.Duration;
 import java.time.temporal.TemporalAccessor;
 
 import org.ingomohr.trac.model.TracItem;
@@ -45,24 +46,24 @@ public class TracItemInspector {
 	}
 
 	/**
-	 * Returns the number of minutes spent on the given {@link TracItem}.
+	 * Returns the duration of the item.
 	 * 
 	 * @param item the item to inspect. Cannot be <code>null</code>.
-	 * @return minutes spent. <code>-1<code> if not both start- and end time are
-	 *         set.
+	 * @return duration. <code>null</code> if not both of start time and end time in
+	 *         the item are specified.
 	 */
-	public int getTimeSpentInMinutes(TracItem item) {
+	public Duration getDuration(TracItem item) {
 		requireNonNull(item);
 
 		TemporalAccessor startTime = item.startTime();
 		TemporalAccessor endTime = item.endTime();
 
 		if (startTime != null && endTime != null) {
-			return new TimeDiffCalculator().getDiffInMinutes(startTime, endTime);
+			Duration duration = new DurationCalculator().calculateDuration(startTime, endTime);
+			return duration;
 		}
 
-		return -1;
-
+		return null;
 	}
 
 }

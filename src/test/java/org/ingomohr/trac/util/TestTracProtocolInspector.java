@@ -46,14 +46,14 @@ class TestTracProtocolInspector {
 	}
 
 	@Test
-	void getTimeSpanInMinutes() {
+	void getDuration() {
 		assertAll(() -> {
-			assertEquals(-1, objUT.getTimeSpanInMinutes(mkProtocol()));
-			assertEquals(-1, objUT.getTimeSpanInMinutes(mkProtocol(mkItem(null, null))));
-			assertEquals(-1, objUT.getTimeSpanInMinutes(mkProtocol(mkItem(null, "01:00"))));
-			assertEquals(-1, objUT.getTimeSpanInMinutes(mkProtocol(mkItem("01:00", null))));
-			assertEquals(83, objUT.getTimeSpanInMinutes(mkProtocol(mkItem("05:00", "06:23"))));
-			assertEquals(120, objUT.getTimeSpanInMinutes(mkProtocol(mkItem("23:00", "01:00"))));
+			assertEquals(null, objUT.getDuration(mkProtocol()));
+			assertEquals(null, objUT.getDuration(mkProtocol(mkItem(null, null))));
+			assertEquals(null, objUT.getDuration(mkProtocol(mkItem(null, "01:00"))));
+			assertEquals(null, objUT.getDuration(mkProtocol(mkItem("01:00", null))));
+			assertEquals(83, objUT.getDuration(mkProtocol(mkItem("05:00", "06:23"))).toMinutes());
+			assertEquals(120, objUT.getDuration(mkProtocol(mkItem("23:00", "01:00"))).toMinutes());
 		});
 
 	}

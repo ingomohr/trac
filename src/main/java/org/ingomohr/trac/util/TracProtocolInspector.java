@@ -2,6 +2,7 @@ package org.ingomohr.trac.util;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.Duration;
 import java.time.temporal.TemporalAccessor;
 import java.util.List;
 import java.util.Objects;
@@ -52,22 +53,23 @@ public class TracProtocolInspector {
 	}
 
 	/**
-	 * Returns the number of minutes the given protocol spans from start to end.
+	 * Returns the duration of the given protocol.
 	 * 
-	 * @param protocol the protocol to inspect. Cannot be <code>null</code>.
-	 * @return minutes from start to end. <code>-1<code> if not both start- and end
-	 *         time are available.
+	 * @param protocol the protocol. Cannot be <code>null</code>.
+	 * @return duration. <code>null</code> if protocol doesn't have both a start
+	 *         time and an end time.
 	 */
-	public int getTimeSpanInMinutes(TracProtocol protocol) {
+	public Duration getDuration(TracProtocol protocol) {
 		requireNonNull(protocol);
 
-		TemporalAccessor startTime = getStartTime(protocol);
-		TemporalAccessor endTime = getEndTime(protocol);
+		final TemporalAccessor startTime = getStartTime(protocol);
+		final TemporalAccessor endTime = getEndTime(protocol);
 
 		if (startTime != null && endTime != null) {
-			return new TimeDiffCalculator().getDiffInMinutes(startTime, endTime);
+			Duration duration = new DurationCalculator().calculateDuration(startTime, endTime);
+			return duration;
 		}
-		return -1;
+		return null;
 	}
 
 }
