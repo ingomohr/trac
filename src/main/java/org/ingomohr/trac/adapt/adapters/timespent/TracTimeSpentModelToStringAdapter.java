@@ -2,13 +2,14 @@ package org.ingomohr.trac.adapt.adapters.timespent;
 
 import java.util.Objects;
 
+import org.ingomohr.trac.adapt.ModelToStringAdapter;
 import org.ingomohr.trac.util.DurationToStringConverter;
 import org.ingomohr.trac.util.TimeConverter;
 
 /**
  * Adapts a {@link TracTimeSpentModel} to a String representation.
  */
-public class TracTimeSpentModelToStringAdapter {
+public class TracTimeSpentModelToStringAdapter implements ModelToStringAdapter<TracTimeSpentModel> {
 
 	/**
 	 * Returns a String-representation for the given model.
