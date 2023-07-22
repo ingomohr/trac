@@ -5,6 +5,7 @@ package org.ingomohr.trac.adapt;
  * 
  * @param <T> the model type
  */
+@FunctionalInterface
 public interface ModelToStringAdapter<T> {
 
 	/**
