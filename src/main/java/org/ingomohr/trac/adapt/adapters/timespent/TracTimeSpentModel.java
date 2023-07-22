@@ -8,6 +8,6 @@ import java.util.List;
  */
 public record TracTimeSpentModel(
 
-        List<TracTimeSpentModelEntry> entries) {
+		List<TracTimeSpentModelEntry> entries) {
 
 }

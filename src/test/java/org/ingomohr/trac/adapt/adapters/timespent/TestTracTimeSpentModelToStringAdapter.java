@@ -17,79 +17,79 @@ import org.junit.jupiter.api.Test;
  */
 public class TestTracTimeSpentModelToStringAdapter {
 
-    private TracTimeSpentModelToStringAdapter objUT;
+	private TracTimeSpentModelToStringAdapter objUT;
 
-    @BeforeEach
-    void prep() {
-        objUT = new TracTimeSpentModelToStringAdapter();
-    }
+	@BeforeEach
+	void prep() {
+		objUT = new TracTimeSpentModelToStringAdapter();
+	}
 
-    @Test
-    void adapt_ModelIsEmpty_ReturnsInfoThatNoInformationWasFound() {
+	@Test
+	void adapt_ModelIsEmpty_ReturnsInfoThatNoInformationWasFound() {
 
-        String expected = """
-                # Time spent
-                no information found
-                """;
+		String expected = """
+				# Time spent
+				no information found
+				""";
 
-        String actual = objUT.adapt(new TracTimeSpentModel(Collections.emptyList()));
-        assertEquals(expected, actual);
-    }
+		String actual = objUT.adapt(new TracTimeSpentModel(Collections.emptyList()));
+		assertEquals(expected, actual);
+	}
 
-    @Test
-    void adapt_ModelHasProtocol_ReturnsInfoForProtocol() {
-        String expected = """
-                # Time spent
-                ------------------------------------------
-                  1. MyTitle 10:00 - 12:00 -- EWT:  1h  0m
-                
-                EWT: Effective working time (i.e. w/o breaks)
-                """;
+	@Test
+	void adapt_ModelHasProtocol_ReturnsInfoForProtocol() {
+		String expected = """
+				# Time spent
+				------------------------------------------
+				  1. MyTitle 10:00 - 12:00 -- EWT:  1h  0m
 
-        TracProtocol prot = new TracProtocol("MyTitle");
-        TracTimeSpentModelEntry entry = new TracTimeSpentModelEntry(prot, mkTime("10:00"), mkTime("12:00"),
-                mkDuration(60));
+				EWT: Effective working time (i.e. w/o breaks)
+				""";
 
-        TracTimeSpentModel model = new TracTimeSpentModel(Arrays.asList(entry));
+		TracProtocol prot = new TracProtocol("MyTitle");
+		TracTimeSpentModelEntry entry = new TracTimeSpentModelEntry(prot, mkTime("10:00"), mkTime("12:00"),
+				mkDuration(60));
 
-        String actual = objUT.adapt(model);
+		TracTimeSpentModel model = new TracTimeSpentModel(Arrays.asList(entry));
 
-        assertEquals(expected, actual);
-    }
+		String actual = objUT.adapt(model);
 
-    @Test
-    void adapt_ModelMultipleProtocolsTheSecondOfWhichHasNoValues_ReturnsInfosForAllProtocolsAndDisplaysNoInfoStringsForSecondProtocol() {
-        String expected = """
-                # Time spent
-                ---------------------------------------------------------------------
-                  1. MyTitle    10:00           - 12:00         -- EWT:        1h  0m
-                  2. <no title> <no start time> - <no end time> -- EWT: <no duration>
-                
-                EWT: Effective working time (i.e. w/o breaks)
-                """;
+		assertEquals(expected, actual);
+	}
 
-        TracProtocol prot0 = new TracProtocol("MyTitle");
-        TracTimeSpentModelEntry entry0 = new TracTimeSpentModelEntry(prot0, mkTime("10:00"), mkTime("12:00"),
-                mkDuration(60));
+	@Test
+	void adapt_ModelMultipleProtocolsTheSecondOfWhichHasNoValues_ReturnsInfosForAllProtocolsAndDisplaysNoInfoStringsForSecondProtocol() {
+		String expected = """
+				# Time spent
+				---------------------------------------------------------------------
+				  1. MyTitle    10:00           - 12:00         -- EWT:        1h  0m
+				  2. <no title> <no start time> - <no end time> -- EWT: <no duration>
 
-        TracProtocol prot1 = new TracProtocol(null);
-        TracTimeSpentModelEntry entry1 = new TracTimeSpentModelEntry(prot1, null, null, null);
+				EWT: Effective working time (i.e. w/o breaks)
+				""";
 
-        TracTimeSpentModel model = new TracTimeSpentModel(Arrays.asList(entry0, entry1));
+		TracProtocol prot0 = new TracProtocol("MyTitle");
+		TracTimeSpentModelEntry entry0 = new TracTimeSpentModelEntry(prot0, mkTime("10:00"), mkTime("12:00"),
+				mkDuration(60));
 
-        String actual = objUT.adapt(model);
-        assertEquals(expected, actual);
-    }
+		TracProtocol prot1 = new TracProtocol(null);
+		TracTimeSpentModelEntry entry1 = new TracTimeSpentModelEntry(prot1, null, null, null);
 
-    private TemporalAccessor mkTime(String HHmm) {
-        if (HHmm != null) {
-            return new TimeConverter().toTime(HHmm);
-        }
-        return null;
-    }
+		TracTimeSpentModel model = new TracTimeSpentModel(Arrays.asList(entry0, entry1));
 
-    private Duration mkDuration(int minutes) {
-        return Duration.ofMinutes(minutes);
-    }
+		String actual = objUT.adapt(model);
+		assertEquals(expected, actual);
+	}
+
+	private TemporalAccessor mkTime(String HHmm) {
+		if (HHmm != null) {
+			return new TimeConverter().toTime(HHmm);
+		}
+		return null;
+	}
+
+	private Duration mkDuration(int minutes) {
+		return Duration.ofMinutes(minutes);
+	}
 
 }

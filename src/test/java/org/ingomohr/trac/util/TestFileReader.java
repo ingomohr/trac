@@ -12,26 +12,26 @@ import org.junit.jupiter.api.Test;
 
 public class TestFileReader {
 
-    private FileReader objUT;
+	private FileReader objUT;
 
-    @BeforeEach
-    void prep() {
-        objUT = new FileReader();
-    }
+	@BeforeEach
+	void prep() {
+		objUT = new FileReader();
+	}
 
-    @Test
-    void readAllLines() throws IOException {
-        Path path = Paths.get("src/test/resources/org/ingomohr/trac/trac.txt");
-        List<String> lines = objUT.readAllLines(path);
+	@Test
+	void readAllLines() throws IOException {
+		Path path = Paths.get("src/test/resources/org/ingomohr/trac/trac.txt");
+		List<String> lines = objUT.readAllLines(path);
 
-        var expected = """
-                    So (Feb 6 2021)
-                    # some comment
-                    # MiniSets: 0
-                    # wfh
-                    ---
-                    01:38-02:15 Some content # + 0.75h Buffer""";
+		var expected = """
+				So (Feb 6 2021)
+				# some comment
+				# MiniSets: 0
+				# wfh
+				---
+				01:38-02:15 Some content # + 0.75h Buffer""";
 
-        assertEquals(expected, String.join(System.lineSeparator(), lines));
-    }
+		assertEquals(expected, String.join(System.lineSeparator(), lines));
+	}
 }

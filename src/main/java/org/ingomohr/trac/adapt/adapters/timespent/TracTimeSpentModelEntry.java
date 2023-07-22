@@ -11,12 +11,12 @@ import org.ingomohr.trac.model.TracProtocol;
  */
 public record TracTimeSpentModelEntry(
 
-        TracProtocol protocol,
+		TracProtocol protocol,
 
-        TemporalAccessor startTime,
+		TemporalAccessor startTime,
 
-        TemporalAccessor endTime,
+		TemporalAccessor endTime,
 
-        Duration timeSpent) {
+		Duration timeSpent) {
 
 }

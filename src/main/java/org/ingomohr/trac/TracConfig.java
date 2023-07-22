@@ -8,53 +8,53 @@ package org.ingomohr.trac;
  */
 public class TracConfig {
 
-    private String path;
+	private String path;
 
-    private String[] adapterIDs;
+	private String[] adapterIDs;
 
-    public static TracConfig fromArgs(String[] args) {
-        TracConfig config = new TracConfig();
+	public static TracConfig fromArgs(String[] args) {
+		TracConfig config = new TracConfig();
 
-        boolean recordingPath = false;
-        boolean recordingAdapterIDs = false;
+		boolean recordingPath = false;
+		boolean recordingAdapterIDs = false;
 
-        for (String arg : args) {
+		for (String arg : args) {
 
-            if ("-path".equals(arg)) {
-                recordingPath = true;
-                recordingAdapterIDs = false;
-            } else if ("-p".equals(arg)) {
-                recordingPath = false;
-                recordingAdapterIDs = true;
-            } else {
-                if (recordingPath) {
-                    config.setPath(arg);
-                } else if (recordingAdapterIDs) {
-                    config.setAdapterIDs(arg.split(","));
-                }
+			if ("-path".equals(arg)) {
+				recordingPath = true;
+				recordingAdapterIDs = false;
+			} else if ("-p".equals(arg)) {
+				recordingPath = false;
+				recordingAdapterIDs = true;
+			} else {
+				if (recordingPath) {
+					config.setPath(arg);
+				} else if (recordingAdapterIDs) {
+					config.setAdapterIDs(arg.split(","));
+				}
 
-                recordingPath = false;
-                recordingAdapterIDs = false;
-            }
-        }
+				recordingPath = false;
+				recordingAdapterIDs = false;
+			}
+		}
 
-        return config;
-    }
+		return config;
+	}
 
-    public String[] getAdapterIDs() {
-        return adapterIDs;
-    }
+	public String[] getAdapterIDs() {
+		return adapterIDs;
+	}
 
-    public void setAdapterIDs(String[] adapterIDs) {
-        this.adapterIDs = adapterIDs;
-    }
+	public void setAdapterIDs(String[] adapterIDs) {
+		this.adapterIDs = adapterIDs;
+	}
 
-    public String getPath() {
-        return path;
-    }
+	public String getPath() {
+		return path;
+	}
 
-    public void setPath(String path) {
-        this.path = path;
-    }
+	public void setPath(String path) {
+		this.path = path;
+	}
 
 }

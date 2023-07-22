@@ -16,12 +16,12 @@ import org.ingomohr.trac.model.TracProtocol;
 @FunctionalInterface
 public interface ITracAdapter<T> {
 
-    /**
-     * Adapts the given protocols.
-     * 
-     * @param protocols the protocols to adapt. Cannot be <code>null</code>.
-     * @return adapted model. Never <code>null</code>.
-     */
-    T adapt(List<TracProtocol> protocols);
+	/**
+	 * Adapts the given protocols.
+	 * 
+	 * @param protocols the protocols to adapt. Cannot be <code>null</code>.
+	 * @return adapted model. Never <code>null</code>.
+	 */
+	T adapt(List<TracProtocol> protocols);
 
 }

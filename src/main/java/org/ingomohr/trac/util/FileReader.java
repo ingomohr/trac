@@ -11,15 +11,15 @@ import java.util.Objects;
  */
 public class FileReader {
 
-    /**
-     * Reads all lines from the file under the given path.
-     * 
-     * @param path the path. Cannot be <code>null</code>
-     * @return all lines. Never <code>null</code>, probably empty.
-     * @throws IOException if reading fails.
-     */
-    public List<String> readAllLines(Path path) throws IOException {
-        return Files.readAllLines(Objects.requireNonNull(path));
-    }
+	/**
+	 * Reads all lines from the file under the given path.
+	 * 
+	 * @param path the path. Cannot be <code>null</code>
+	 * @return all lines. Never <code>null</code>, probably empty.
+	 * @throws IOException if reading fails.
+	 */
+	public List<String> readAllLines(Path path) throws IOException {
+		return Files.readAllLines(Objects.requireNonNull(path));
+	}
 
 }
